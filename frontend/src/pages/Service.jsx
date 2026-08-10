@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import SectionTitle from '../components/SectionTitle/SectionTitle';
 import ServiceCard from '../components/ServiceCard/ServiceCard';
 import { kopdesData } from '../data/dummyData';
-import { Building2, Phone } from 'lucide-react';
+
 
 const Service = () => {
   // Display max 9 unit services as requested
@@ -61,28 +61,7 @@ const Service = () => {
             ))}
           </div>
 
-          {/* Consultation Box */}
-          <div className="mt-16 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-red-50 text-primary flex items-center justify-center flex-shrink-0">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900 font-poppins">Butuh Informasi Pengajuan Layanan?</h4>
-                <p className="text-xs text-slate-600">Pengurus Kopdes Merah Putih siap melayani konsultasi pendaftaran dan keanggotaan.</p>
-              </div>
-            </div>
 
-            <a
-              href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-600 shadow-md shadow-red-500/20 transition-all flex-shrink-0"
-            >
-              <Phone className="w-4 h-4" />
-              <span>Hubungi Pengurus WA</span>
-            </a>
-          </div>
 
         </div>
       </section>

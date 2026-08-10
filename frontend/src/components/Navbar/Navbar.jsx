@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, ChevronRight } from 'lucide-react';
+import { Menu, X, ChevronRight } from 'lucide-react';
 import { kopdesData } from '../../data/dummyData';
 
 const Navbar = () => {
@@ -80,18 +80,6 @@ const Navbar = () => {
             })}
           </nav>
 
-          {/* CTA Right Button */}
-          <div className="hidden md:flex items-center gap-3">
-            <a
-              href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-700 shadow-sm transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              <span>Hubungi Pengurus</span>
-            </a>
-          </div>
 
           {/* Mobile Hamburger Button */}
           <div className="flex md:hidden items-center gap-2">
@@ -136,17 +124,7 @@ const Navbar = () => {
                 );
               })}
 
-              <div className="pt-3 border-t border-slate-100">
-                <a
-                  href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-white text-xs font-bold bg-primary shadow-sm"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Hubungi Pengurus WhatsApp</span>
-                </a>
-              </div>
+
             </div>
           </motion.div>
         )}
