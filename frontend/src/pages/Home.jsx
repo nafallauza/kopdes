@@ -63,7 +63,7 @@ const Home = () => {
               to="/layanan"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-white hover:bg-primary-600 font-bold text-sm shadow-md shadow-red-500/20 transition-all duration-200"
             >
-              <span>Lihat Seluruh Layanan ({kopdesData.layanan.length} Unit)</span>
+              <span>Lihat Seluruh Layanan</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
