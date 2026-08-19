@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, Compass } from 'lucide-react';
-import { kopdesData } from '../../data/dummyData';
+import { useKopdes } from '../../context/KopdesContext';
 import SectionTitle from '../SectionTitle/SectionTitle';
 
 const VisiMisi = () => {
+  const { kopdesData } = useKopdes();
+
   return (
     <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

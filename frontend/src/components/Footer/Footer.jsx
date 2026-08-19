@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Facebook, Instagram, Youtube, Flag, ShieldCheck } from 'lucide-react';
-import { kopdesData } from '../../data/dummyData';
+import { useKopdes } from '../../context/KopdesContext';
 
 const Footer = () => {
+  const { kopdesData } = useKopdes();
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,6 +59,11 @@ const Footer = () => {
               <li>
                 <Link to="/galeri" className="text-slate-400 hover:text-white transition-colors">
                   Galeri Dokumentasi
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/login" className="text-slate-400 hover:text-white transition-colors">
+                  Portal Admin Kopdes
                 </Link>
               </li>
             </ul>

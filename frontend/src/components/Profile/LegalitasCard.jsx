@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FileText, MapPin, CheckCircle2 } from 'lucide-react';
-import { kopdesData } from '../../data/dummyData';
+import { useKopdes } from '../../context/KopdesContext';
 import SectionTitle from '../SectionTitle/SectionTitle';
 
 const LegalitasCard = () => {
+  const { kopdesData } = useKopdes();
+
   const legalItems = [
     {
       title: "Nomor Badan Hukum",

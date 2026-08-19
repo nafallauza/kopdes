@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { UserCheck } from 'lucide-react';
-import { kopdesData } from '../../data/dummyData';
+import { useKopdes } from '../../context/KopdesContext';
 import SectionTitle from '../SectionTitle/SectionTitle';
 
 const PengurusSection = () => {
+  const { kopdesData } = useKopdes();
+
   const pengurusList = [
     { key: 'ketua', title: 'Ketua Pengurus', badge: 'Ketua', color: 'bg-primary text-white' },
     { key: 'sekretaris', title: 'Sekretaris', badge: 'Sekretaris', color: 'bg-slate-900 text-white' },
@@ -64,9 +66,11 @@ const PengurusSection = () => {
                       {data.nama}
                     </h4>
 
-                    <p className="text-slate-600 text-xs mt-2.5 leading-relaxed italic line-clamp-3">
-                      "{data.pesan}"
-                    </p>
+                    {data.pesan && (
+                      <p className="text-slate-600 text-xs mt-2.5 leading-relaxed italic line-clamp-3">
+                        "{data.pesan}"
+                      </p>
+                    )}
                   </div>
                 </div>
 

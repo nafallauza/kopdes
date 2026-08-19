@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
-import { kopdesData } from '../../data/dummyData';
+import { useKopdes } from '../../context/KopdesContext';
 
 const FloatingContact = () => {
+  const { kopdesData } = useKopdes();
   const isDragging = useRef(false);
 
   return (
