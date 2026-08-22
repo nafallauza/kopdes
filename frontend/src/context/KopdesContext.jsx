@@ -44,6 +44,20 @@ export const KopdesProvider = ({ children }) => {
     }));
   };
 
+  // Profile Update (Statis: Legal, Visi, Deskripsi)
+  const updateProfileStatis = (updatedFields) => {
+    setData((prev) => ({
+      ...prev,
+      legal: {
+        ...prev.legal,
+        badanHukum: updatedFields.badanHukum ?? prev.legal.badanHukum,
+        wilayahKerja: updatedFields.wilayahKerja ?? prev.legal.wilayahKerja,
+      },
+      visi: updatedFields.visi ?? prev.visi,
+      description: updatedFields.description ?? prev.description,
+    }));
+  };
+
   // Layanan CRUD (Dinamis)
   const addLayanan = (newUnit) => {
     const unitWithId = {
@@ -125,6 +139,7 @@ export const KopdesProvider = ({ children }) => {
     <KopdesContext.Provider
       value={{
         kopdesData: data,
+        updateProfileStatis,
         updateProfileDinamis,
         addLayanan,
         updateLayanan,

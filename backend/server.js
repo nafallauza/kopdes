@@ -11,8 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security & Logger Middlewares
-app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));

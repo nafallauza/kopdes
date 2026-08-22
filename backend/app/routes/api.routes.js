@@ -8,9 +8,23 @@ const { verifyToken } = require('../middleware/auth.middleware');
 // Auth Routes
 router.post('/auth/login', authController.login);
 router.post('/auth/register', authController.register);
+router.post('/auth/forgot-password', authController.forgotPassword);
 
 // Anggota Routes
 router.get('/anggota', verifyToken, anggotaController.getAllAnggota);
 router.get('/anggota/:id', verifyToken, anggotaController.getAnggotaById);
+const kategoriController = require('../controllers/kategori.controller');
+const galeriController = require('../controllers/galeri.controller');
+const upload = require('../middleware/upload.middleware');
+
+// Kategori Routes
+router.get('/kategori', kategoriController.getAllKategori);
+
+// Galeri Routes (POST form-data)
+router.post('/galeri', upload.single('gambar'), galeriController.tambahGaleri);
+
+const uploadController = require('../controllers/upload.controller');
+// Generic Upload Route (Untuk Profile/Pengurus)
+router.post('/upload', upload.single('gambar'), uploadController.uploadImage);
 
 module.exports = router;

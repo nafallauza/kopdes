@@ -9,6 +9,40 @@ const Gallery = () => {
   const { kopdesData } = useKopdes();
   const [activeItem, setActiveItem] = useState(null);
 
+  const getEmbedUrl = (urlStr) => {
+    if (!urlStr) return '';
+    try {
+      // YOUTUBE
+      if (urlStr.includes('youtube.com') || urlStr.includes('youtu.be')) {
+        let videoId = '';
+        if (urlStr.includes('youtu.be/')) videoId = urlStr.split('youtu.be/')[1].split('?')[0];
+        else if (urlStr.includes('youtube.com/watch')) videoId = new URL(urlStr).searchParams.get('v');
+        else if (urlStr.includes('youtube.com/shorts/')) videoId = urlStr.split('shorts/')[1].split('?')[0];
+        else if (urlStr.includes('youtube.com/embed/')) return urlStr;
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      }
+      // TIKTOK
+      else if (urlStr.includes('tiktok.com')) {
+        if (urlStr.includes('/embed/')) return urlStr;
+        const match = urlStr.match(/\/video\/(\d+)/);
+        if (match && match[1]) return `https://www.tiktok.com/embed/v2/${match[1]}`;
+      }
+      // INSTAGRAM
+      else if (urlStr.includes('instagram.com')) {
+        if (urlStr.includes('/embed')) return urlStr;
+        const cleanUrl = urlStr.split('?')[0].replace(/\/$/, '');
+        return `${cleanUrl}/embed`;
+      }
+      // FACEBOOK
+      else if (urlStr.includes('facebook.com') && (urlStr.includes('/videos/') || urlStr.includes('/watch'))) {
+        return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(urlStr)}&show_text=false`;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return urlStr; // Fallback
+  };
+
   return (
     <div className="pt-24 lg:pt-32">
       {/* Banner Title */}
@@ -44,6 +78,7 @@ const Gallery = () => {
                 item={item}
                 index={index}
                 onClick={(selected) => setActiveItem(selected)}
+                getEmbedUrl={getEmbedUrl}
               />
             ))}
           </div>
@@ -81,7 +116,7 @@ const Gallery = () => {
               <div className="relative aspect-[16/10] bg-black flex items-center justify-center">
                 {activeItem.mediaType === 'video' || (activeItem.url && activeItem.url.includes('youtube')) ? (
                   <iframe
-                    src={activeItem.url.replace('watch?v=', 'embed/')}
+                    src={getEmbedUrl(activeItem.url)}
                     title={activeItem.title}
                     className="w-full h-full border-0"
                     allowFullScreen

@@ -2,7 +2,30 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 
-const GalleryCard = ({ item, index, onClick }) => {
+const GalleryCard = ({ item, index, onClick, getEmbedUrl }) => {
+  const getYouTubeThumbnail = (urlStr) => {
+    if (!urlStr) return urlStr;
+    try {
+      let videoId = '';
+      if (urlStr.includes('youtu.be/')) {
+        videoId = urlStr.split('youtu.be/')[1].split('?')[0];
+      } else if (urlStr.includes('youtube.com/watch')) {
+        const urlObj = new URL(urlStr);
+        videoId = urlObj.searchParams.get('v');
+      } else if (urlStr.includes('youtube.com/shorts/')) {
+        videoId = urlStr.split('shorts/')[1].split('?')[0];
+      } else if (urlStr.includes('youtube.com/embed/')) {
+        videoId = urlStr.split('embed/')[1].split('?')[0];
+      }
+      if (videoId) return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    } catch (e) {
+      console.error(e);
+    }
+    return urlStr;
+  };
+
+  const isYouTube = item.url && (item.url.includes('youtube.com') || item.url.includes('youtu.be'));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -15,12 +38,24 @@ const GalleryCard = ({ item, index, onClick }) => {
       <div>
         {/* Media Frame */}
         <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200">
-          <img
-            src={item.url}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-            loading="lazy"
-          />
+          {item.mediaType === 'video' ? (
+            <div className="relative w-full h-full pointer-events-none overflow-hidden bg-slate-900">
+              <iframe
+                src={getEmbedUrl ? getEmbedUrl(item.url) : item.url}
+                title={item.title}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full min-h-[150%] min-w-[100%] border-0 opacity-80"
+                scrolling="no"
+                allowFullScreen
+              ></iframe>
+            </div>
+          ) : (
+            <img
+              src={item.url}
+              alt={item.title}
+              className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+              loading="lazy"
+            />
+          )}
         </div>
 
         {/* Caption */}
