@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, CheckCircle2, Save, X, Image as ImageIcon, Video } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 import { useKopdes } from '../../context/KopdesContext';
+import { supabase } from '../../config/supabaseClient';
 
 const AdminGaleri = () => {
   const { kopdesData, addGaleri, updateGaleri, deleteGaleri } = useKopdes();
@@ -64,38 +65,49 @@ const AdminGaleri = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('mediaType', mediaType);
+      let finalUrl = url;
 
       if (mediaType === 'image' && selectedFile) {
-        formData.append('gambar', selectedFile, selectedFile.name || 'image.jpg');
-      } else if (mediaType === 'video') {
-        formData.append('url', url);
+        const fileExt = selectedFile.name.split('.').pop() || 'jpg';
+        const fileName = `galeri_${Math.random()}.${fileExt}`;
+        const filePath = `galeri/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('kopdes_images')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage
+          .from('kopdes_images')
+          .getPublicUrl(filePath);
+
+        if (data?.publicUrl) {
+          finalUrl = data.publicUrl;
+        }
       }
 
-      const apiUrl = `http://${window.location.hostname}:5000/api/v1/galeri`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSuccessMessage(`Item Galeri baru "${title}" berhasil ditambahkan.`);
-        addGaleri({
+      if (editingId) {
+        await updateGaleri(editingId, {
           mediaType,
           title,
           caption,
-          url: result.data.url_gambar
+          url: finalUrl
         });
+        setSuccessMessage(`Item Galeri "${title}" berhasil diperbarui.`);
       } else {
-        alert('Gagal menyimpan ke server: ' + result.message);
+        await addGaleri({
+          mediaType,
+          title,
+          caption,
+          url: finalUrl
+        });
+        setSuccessMessage(`Item Galeri baru "${title}" berhasil ditambahkan.`);
       }
+      
     } catch (err) {
       console.error(err);
-      alert('Terjadi kesalahan jaringan.');
+      alert('Terjadi kesalahan jaringan atau upload gagal.');
     }
 
     setModalOpen(false);

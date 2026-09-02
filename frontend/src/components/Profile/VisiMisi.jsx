@@ -65,7 +65,7 @@ const VisiMisi = () => {
               </h3>
 
               <div className="space-y-3.5">
-                {kopdesData.misi.map((misiText, idx) => (
+                {(typeof kopdesData.misi === 'string' ? kopdesData.misi.split('\n').filter(Boolean) : kopdesData.misi || []).map((misiText, idx) => (
                   <div key={idx} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded bg-red-50 text-primary border border-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 font-bold text-xs">
                       {idx + 1}

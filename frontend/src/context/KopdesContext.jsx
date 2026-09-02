@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { kopdesData as initialData } from '../data/dummyData';
 
+import { supabase } from '../config/supabaseClient';
+
 const KopdesContext = createContext();
 
 const STORAGE_KEY = 'kopdes_app_data_v1';
@@ -24,38 +26,132 @@ export const KopdesProvider = ({ children }) => {
     }
   }, [data]);
 
-  // Profile Update (Dinamis: Alamat, Ketua, Sekretaris, Bendahara, Pengawas)
-  const updateProfileDinamis = (updatedFields) => {
-    setData((prev) => ({
-      ...prev,
-      kontak: {
-        ...prev.kontak,
-        alamat: updatedFields.alamat ?? prev.kontak.alamat,
-        googleMapsLink: updatedFields.googleMapsLink ?? prev.kontak.googleMapsLink,
-        googleMapsEmbedUrl: updatedFields.googleMapsEmbedUrl ?? prev.kontak.googleMapsEmbedUrl,
-      },
-      pengurus: {
-        ...prev.pengurus,
-        ketua: updatedFields.ketua ? { ...prev.pengurus.ketua, ...updatedFields.ketua } : prev.pengurus.ketua,
-        sekretaris: updatedFields.sekretaris ? { ...prev.pengurus.sekretaris, ...updatedFields.sekretaris } : prev.pengurus.sekretaris,
-        bendahara: updatedFields.bendahara ? { ...prev.pengurus.bendahara, ...updatedFields.bendahara } : prev.pengurus.bendahara,
-        pengawas: updatedFields.pengawas ? { ...prev.pengurus.pengawas, ...updatedFields.pengawas } : prev.pengurus.pengawas,
+  // Fetch from backend on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: dbData, error } = await supabase
+          .from('profil_koperasi')
+          .select('*')
+          .eq('id', 1)
+          .single();
+          
+        if (error && error.code !== 'PGRST116') throw error; 
+        
+        const { data: galeriData, error: galeriError } = await supabase
+          .from('galeri')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (galeriError) throw galeriError;
+
+        setData(prev => ({
+          ...prev,
+          ...(dbData ? {
+            namaKoperasi: dbData.nama_koperasi,
+            description: dbData.deskripsi,
+            visi: dbData.visi,
+            misi: dbData.misi,
+            legal: dbData.legal_json || prev.legal,
+            kontak: dbData.kontak_json || prev.kontak,
+            pengurus: dbData.pengurus_json || prev.pengurus,
+          } : {}),
+          galeri: galeriData ? galeriData.map(g => ({
+            id: g.id,
+            mediaType: g.media_type,
+            title: g.title,
+            caption: g.caption,
+            url: g.url,
+            date: g.date
+          })) : prev.galeri
+        }));
+      } catch (e) {
+        console.error('Gagal mengambil data dari server:', e);
       }
-    }));
+    };
+    fetchData();
+  }, []);
+
+  // Profile Update (Dinamis: Alamat, Ketua, Sekretaris, Bendahara, Pengawas)
+  const updateProfileDinamis = async (updatedFields, token) => {
+    try {
+      const kontak = {
+        ...data.kontak,
+        alamat: updatedFields.alamat ?? data.kontak.alamat,
+        googleMapsLink: updatedFields.googleMapsLink ?? data.kontak.googleMapsLink,
+        googleMapsEmbedUrl: updatedFields.googleMapsEmbedUrl ?? data.kontak.googleMapsEmbedUrl,
+      };
+      const pengurus = {
+        ...data.pengurus,
+        ketua: updatedFields.ketua ? { ...data.pengurus.ketua, ...updatedFields.ketua } : data.pengurus.ketua,
+        sekretaris: updatedFields.sekretaris ? { ...data.pengurus.sekretaris, ...updatedFields.sekretaris } : data.pengurus.sekretaris,
+        bendahara: updatedFields.bendahara ? { ...data.pengurus.bendahara, ...updatedFields.bendahara } : data.pengurus.bendahara,
+        pengawas: updatedFields.pengawas ? { ...data.pengurus.pengawas, ...updatedFields.pengawas } : data.pengurus.pengawas,
+      };
+
+      const { error } = await supabase
+        .from('profil_koperasi')
+        .update({
+          kontak_json: kontak,
+          pengurus_json: pengurus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1);
+
+      if (error) throw error;
+
+      setData((prev) => ({
+        ...prev,
+        kontak,
+        pengurus
+      }));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
 
   // Profile Update (Statis: Legal, Visi, Deskripsi)
-  const updateProfileStatis = (updatedFields) => {
-    setData((prev) => ({
-      ...prev,
-      legal: {
-        ...prev.legal,
-        badanHukum: updatedFields.badanHukum ?? prev.legal.badanHukum,
-        wilayahKerja: updatedFields.wilayahKerja ?? prev.legal.wilayahKerja,
-      },
-      visi: updatedFields.visi ?? prev.visi,
-      description: updatedFields.description ?? prev.description,
-    }));
+  const updateProfileStatis = async (updatedFields, token) => {
+    try {
+      const legal = {
+        ...data.legal,
+        badanHukum: updatedFields.badanHukum ?? data.legal.badanHukum,
+        wilayahKerja: updatedFields.wilayahKerja ?? data.legal.wilayahKerja,
+      };
+      const visi = updatedFields.visi ?? data.visi;
+      const misi = updatedFields.misi ?? data.misi;
+      const description = updatedFields.description ?? data.description;
+      const namaKoperasi = updatedFields.namaKoperasi ?? data.namaKoperasi;
+      const heroImage = updatedFields.heroImage ?? data.heroImage;
+
+      const { error } = await supabase
+        .from('profil_koperasi')
+        .update({
+          nama_koperasi: namaKoperasi,
+          deskripsi: description,
+          visi: visi,
+          misi: misi,
+          legal_json: legal,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1);
+        
+      if (error) throw error;
+
+      setData((prev) => ({
+        ...prev,
+        legal,
+        visi,
+        misi,
+        description,
+        namaKoperasi,
+        heroImage
+      }));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   };
 
   // Layanan CRUD (Dinamis)
@@ -85,30 +181,84 @@ export const KopdesProvider = ({ children }) => {
   };
 
   // Galeri CRUD (Dinamis: Foto / Video + Caption)
-  const addGaleri = (newItem) => {
-    const itemWithId = {
-      ...newItem,
-      id: newItem.id || Date.now(),
-      date: newItem.date || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-    };
-    setData((prev) => ({
-      ...prev,
-      galeri: [itemWithId, ...prev.galeri]
-    }));
+  const addGaleri = async (newItem) => {
+    try {
+      const dateStr = newItem.date || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      
+      const { data: insertedData, error } = await supabase
+        .from('galeri')
+        .insert([{
+          media_type: newItem.mediaType,
+          title: newItem.title,
+          caption: newItem.caption,
+          url: newItem.url,
+          date: dateStr
+        }])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      const itemWithId = {
+        id: insertedData.id,
+        mediaType: insertedData.media_type,
+        title: insertedData.title,
+        caption: insertedData.caption,
+        url: insertedData.url,
+        date: insertedData.date
+      };
+      
+      setData((prev) => ({
+        ...prev,
+        galeri: [itemWithId, ...prev.galeri]
+      }));
+    } catch (err) {
+      console.error('Gagal tambah galeri:', err);
+      throw err;
+    }
   };
 
-  const updateGaleri = (id, updatedItem) => {
-    setData((prev) => ({
-      ...prev,
-      galeri: prev.galeri.map((item) => (item.id === id ? { ...item, ...updatedItem } : item))
-    }));
+  const updateGaleri = async (id, updatedItem) => {
+    try {
+      const { error } = await supabase
+        .from('galeri')
+        .update({
+          media_type: updatedItem.mediaType,
+          title: updatedItem.title,
+          caption: updatedItem.caption,
+          url: updatedItem.url
+        })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      setData((prev) => ({
+        ...prev,
+        galeri: prev.galeri.map((item) => (item.id === id ? { ...item, ...updatedItem } : item))
+      }));
+    } catch (err) {
+      console.error('Gagal update galeri:', err);
+      throw err;
+    }
   };
 
-  const deleteGaleri = (id) => {
-    setData((prev) => ({
-      ...prev,
-      galeri: prev.galeri.filter((item) => item.id !== id)
-    }));
+  const deleteGaleri = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('galeri')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      setData((prev) => ({
+        ...prev,
+        galeri: prev.galeri.filter((item) => item.id !== id)
+      }));
+    } catch (err) {
+      console.error('Gagal hapus galeri:', err);
+      throw err;
+    }
   };
 
   // Footer Update (Dinamis: No Telp, Email, Sosmed)

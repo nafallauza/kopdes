@@ -28,7 +28,7 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const navItems = [
-    { name: "Profile", href: "/" },
+    { name: "Profil", href: "/" },
     { name: "Layanan", href: "/layanan" },
     { name: "Galeri", href: "/galeri" },
   ];
@@ -48,12 +48,12 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-3.5 focus:outline-none">
             <img
               src={kopdesData.logo}
-              alt={kopdesData.name}
+              alt="Logo Kopdes"
               className="h-10 sm:h-12 w-auto object-contain"
             />
             <div className="hidden sm:flex flex-col border-l border-slate-200 pl-3.5">
               <span className="font-bold text-base leading-none text-slate-900 tracking-tight">
-                {kopdesData.shortName}
+                KOPDES <span className="uppercase">{kopdesData.namaKoperasi || 'Desa Anda'}</span>
               </span>
               <span className="text-[11px] font-semibold text-primary uppercase tracking-wider mt-1">
                 Portal Resmi Koperasi Desa

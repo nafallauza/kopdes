@@ -26,7 +26,7 @@ const AdminHeader = ({ setMobileOpen }) => {
 
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold text-slate-900">{kopdesData.branchName}</span>
+            <span className="text-xs font-extrabold text-slate-900">KOPDES {kopdesData.namaKoperasi || 'Desa Anda'}</span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Online
             </span>

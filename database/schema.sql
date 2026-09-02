@@ -65,3 +65,17 @@ CREATE TABLE IF NOT EXISTS `galeri` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`kategori_id`) REFERENCES `kategori`(`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
+
+-- 6. Tabel Profil Koperasi
+CREATE TABLE IF NOT EXISTS `profil_koperasi` (
+  `id` INT UNSIGNED PRIMARY KEY DEFAULT 1,
+  `nama_koperasi` VARCHAR(150) NOT NULL,
+  `singkatan` VARCHAR(50) NOT NULL,
+  `logo_url` VARCHAR(255) NULL,
+  `deskripsi` TEXT NULL,
+  `visi` TEXT NULL,
+  `legal_json` JSON NULL,
+  `kontak_json` JSON NULL,
+  `pengurus_json` JSON NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

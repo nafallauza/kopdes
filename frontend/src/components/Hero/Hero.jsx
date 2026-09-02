@@ -19,21 +19,17 @@ const Hero = () => {
             transition={{ duration: 0.4 }}
             className="lg:col-span-7 flex flex-col items-start"
           >
-            {/* National Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-red-50 border border-red-200 text-primary text-xs font-bold mb-5">
-              <Flag className="w-3.5 h-3.5" />
-              <span>{kopdesData.name}</span>
-            </div>
+
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.2] mb-5">
-              Pilar Ekonomi Desa <br className="hidden sm:block" />
-              <span className="text-primary">Berbasis Gotong Royong</span>
+              Profil Koperasi Desa <br className="hidden sm:block" />
+              <span className="text-primary">{kopdesData.namaKoperasi || 'Desa Anda'}</span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-base text-slate-600 font-normal leading-relaxed max-w-2xl mb-8">
-              Selamat datang di portal resmi <strong className="text-slate-900 font-semibold">{kopdesData.branchName}</strong>. Lembaga ekonomi terpadu untuk pelayanan usaha warga, pemberdayaan anggota, dan ketahanan pangan pedesaan.
+              Selamat datang di portal resmi <strong className="text-slate-900 font-semibold">Kopdes Merah Putih - {kopdesData.namaKoperasi || 'Desa Anda'}</strong>. Lembaga ekonomi terpadu untuk pelayanan usaha warga, pemberdayaan anggota, dan ketahanan pangan pedesaan.
             </p>
 
             {/* Action CTAs */}
@@ -58,7 +54,7 @@ const Hero = () => {
             {/* Micro Legal Info */}
             <div className="flex items-center gap-2 pt-5 border-t border-slate-200 w-full text-xs font-semibold text-slate-600">
               <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
-              <span>Badan Hukum Resmi: {kopdesData.legal.badanHukum}</span>
+              <span>Badan Hukum Resmi: {kopdesData.legal?.badanHukum}</span>
             </div>
 
           </motion.div>
@@ -73,7 +69,7 @@ const Hero = () => {
             <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
               <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-slate-100">
                 <img
-                  src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80"
+                  src={kopdesData.heroImage}
                   alt="Aktivitas Kopdes Merah Putih"
                   className="w-full h-full object-cover"
                 />
@@ -82,8 +78,8 @@ const Hero = () => {
                 <div className="flex items-center gap-2.5 text-left">
                   <img src={kopdesData.logo} alt="Logo" className="h-8 w-auto object-contain" />
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">{kopdesData.shortName}</h4>
-                    <p className="text-[11px] text-slate-500">{kopdesData.legal.wilayahKerja}</p>
+                    <h4 className="text-xs font-bold text-slate-900">KOPDES</h4>
+                    <p className="text-[11px] text-slate-500">{kopdesData.namaKoperasi || 'Desa Anda'}</p>
                   </div>
                 </div>
                 <span className="text-[11px] font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-700">

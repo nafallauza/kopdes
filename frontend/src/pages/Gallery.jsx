@@ -48,9 +48,6 @@ const Gallery = () => {
       {/* Banner Title */}
       <section className="py-14 bg-slate-900 text-white relative overflow-hidden border-b border-slate-800">
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-3 py-1 rounded bg-red-500/20 text-red-300 text-xs font-bold uppercase mb-3 border border-red-500/30">
-            Dokumentasi Resmi
-          </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-3">
             Galeri Kopdes Merah Putih
           </h1>

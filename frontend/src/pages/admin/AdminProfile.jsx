@@ -2,15 +2,22 @@ import React, { useState } from 'react';
 import { Save, CheckCircle2, MapPin, Lock, FileText, UserCheck, Eye, Compass, Target } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 import { useKopdes } from '../../context/KopdesContext';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../config/supabaseClient';
 
 const AdminProfile = () => {
   const { kopdesData, updateProfileStatis, updateProfileDinamis } = useKopdes();
+  const { user } = useAuth();
   const [successMessage, setSuccessMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
+  const [namaKoperasi, setNamaKoperasi] = useState(kopdesData.namaKoperasi);
   const [badanHukum, setBadanHukum] = useState(kopdesData.legal.badanHukum);
   const [wilayahKerja, setWilayahKerja] = useState(kopdesData.legal.wilayahKerja);
   const [visi, setVisi] = useState(kopdesData.visi);
+  const [misi, setMisi] = useState(kopdesData.misi || '');
   const [description, setDescription] = useState(kopdesData.description);
+  const [heroImage, setHeroImage] = useState(kopdesData.heroImage);
 
   const [alamat, setAlamat] = useState(kopdesData.kontak.alamat);
   const [googleMapsLink, setGoogleMapsLink] = useState(kopdesData.kontak.googleMapsLink);
@@ -40,32 +47,74 @@ const AdminProfile = () => {
     pesan: kopdesData.pengurus.pengawas?.pesan || ''
   });
 
-  const handleStatisSubmit = (e) => {
-    e.preventDefault();
-    updateProfileStatis({
-      badanHukum,
-      wilayahKerja,
-      visi,
-      description
-    });
-    setSuccessMessage('Data Profil Statis berhasil diperbarui!');
-    setTimeout(() => setSuccessMessage(''), 4000);
-  };
+  React.useEffect(() => {
+    setNamaKoperasi(kopdesData.namaKoperasi || '');
+    setBadanHukum(kopdesData.legal?.badanHukum || '');
+    setWilayahKerja(kopdesData.legal?.wilayahKerja || '');
+    setVisi(kopdesData.visi || '');
+    setMisi(kopdesData.misi || '');
+    setDescription(kopdesData.description || '');
+    setHeroImage(kopdesData.heroImage || '');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    updateProfileDinamis({
-      alamat,
-      googleMapsLink,
-      googleMapsEmbedUrl,
-      ketua,
-      sekretaris,
-      bendahara,
-      pengawas
-    });
+    setAlamat(kopdesData.kontak?.alamat || '');
+    setGoogleMapsLink(kopdesData.kontak?.googleMapsLink || '');
+    setGoogleMapsEmbedUrl(kopdesData.kontak?.googleMapsEmbedUrl || '');
 
-    setSuccessMessage('Data Profil Dinamis (Alamat & Pengurus) berhasil diperbarui!');
-    setTimeout(() => setSuccessMessage(''), 4000);
+    setKetua({
+      nama: kopdesData.pengurus?.ketua?.nama || '',
+      foto: kopdesData.pengurus?.ketua?.foto || '',
+      pesan: kopdesData.pengurus?.ketua?.pesan || ''
+    });
+    setSekretaris({
+      nama: kopdesData.pengurus?.sekretaris?.nama || '',
+      foto: kopdesData.pengurus?.sekretaris?.foto || '',
+      pesan: kopdesData.pengurus?.sekretaris?.pesan || ''
+    });
+    setBendahara({
+      nama: kopdesData.pengurus?.bendahara?.nama || '',
+      foto: kopdesData.pengurus?.bendahara?.foto || '',
+      pesan: kopdesData.pengurus?.bendahara?.pesan || ''
+    });
+    setPengawas({
+      nama: kopdesData.pengurus?.pengawas?.nama || '',
+      foto: kopdesData.pengurus?.pengawas?.foto || '',
+      pesan: kopdesData.pengurus?.pengawas?.pesan || ''
+    });
+  }, [kopdesData]);
+
+  const handleCombinedSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      // 1. Simpan Data Statis
+      await updateProfileStatis({
+        namaKoperasi,
+        badanHukum,
+        wilayahKerja,
+        visi,
+        misi,
+        description,
+        heroImage
+      }, user?.token);
+
+      // 2. Simpan Data Dinamis (Alamat & Pengurus)
+      await updateProfileDinamis({
+        alamat,
+        googleMapsLink,
+        googleMapsEmbedUrl,
+        ketua,
+        sekretaris,
+        bendahara,
+        pengawas
+      }, user?.token);
+
+      setSuccessMessage('Seluruh Data Profil berhasil diperbarui!');
+    } catch (err) {
+      alert('Gagal menyimpan profil');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    }
   };
 
   const [isUploading, setIsUploading] = useState(false);
@@ -89,24 +138,71 @@ const AdminProfile = () => {
       
       const compressedFile = await imageCompression(file, options);
       
-      const formData = new FormData();
-      formData.append('gambar', compressedFile, compressedFile.name || 'profile.jpg');
-      
-      const apiUrl = `http://${window.location.hostname}:5000/api/v1/upload`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        body: formData
-      });
-      
-      const result = await response.json();
-      if (result.success) {
-        setter({ ...currentState, foto: result.data.url });
-      } else {
-        alert('Gagal mengupload: ' + result.message);
+      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `profiles/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('kopdes_images')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('kopdes_images')
+        .getPublicUrl(filePath);
+
+      if (data?.publicUrl) {
+        setter({ ...currentState, foto: data.publicUrl });
       }
     } catch (err) {
       console.error(err);
-      alert('Terjadi kesalahan jaringan.');
+      alert('Terjadi kesalahan jaringan atau upload gagal.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+
+  const handleUploadHeroImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal adalah 5MB.');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1200,
+        useWebWorker: true
+      };
+
+      const compressedFile = await imageCompression(file, options);
+      
+      const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+      const fileName = `hero_${Math.random()}.${fileExt}`;
+      const filePath = `hero/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('kopdes_images')
+        .upload(filePath, compressedFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('kopdes_images')
+        .getPublicUrl(filePath);
+
+      if (data?.publicUrl) {
+        setHeroImage(data.publicUrl);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Terjadi kesalahan jaringan saat upload gambar.');
     } finally {
       setIsUploading(false);
     }
@@ -117,7 +213,7 @@ const AdminProfile = () => {
 
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900">Pengelolaan Profile</h1>
+          <h1 className="text-xl font-extrabold text-slate-900">Pengelolaan Profil</h1>
           <p className="text-xs text-slate-600 mt-1">
             Kelola data statis (informasi resmi) dan data dinamis (Alamat & Struktur Pengurus).
           </p>
@@ -131,24 +227,64 @@ const AdminProfile = () => {
         </div>
       )}
 
-      <form onSubmit={handleStatisSubmit} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-          <div className="flex items-center gap-2">
-            
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              1. Informational Statis (Konfigurasi)
-            </h2>
+      <form onSubmit={handleCombinedSubmit} className="space-y-6">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div className="flex items-center gap-2">
+              
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                Profil
+              </h2>
+            </div>
           </div>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-colors"
-          >
-            
-            <span>Simpan</span>
-          </button>
+
+          <div className="grid grid-cols-1 gap-4 text-xs pt-2">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+            <span className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+               Nama Daerah KOPDES
+            </span>
+            <input
+              type="text"
+              value={namaKoperasi}
+              onChange={(e) => setNamaKoperasi(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 font-semibold text-slate-900 focus:outline-none focus:border-primary text-xs"
+              placeholder="Contoh: Desa Kertamukti"
+            />
+            <p className="text-[11px] text-slate-500">Akan ditampilkan sebagai bagian dari KOPDES Merah Putih - [Nama Daerah]</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div className="grid grid-cols-1 gap-4 text-xs">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+            <span className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+               Foto Profil Hero
+            </span>
+            <div className="flex flex-col gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleUploadHeroImage}
+                className="block w-full text-xs text-slate-700
+                    file:mr-4 file:py-1.5 file:px-3
+                    file:rounded-lg file:border-0
+                    file:text-xs file:font-semibold
+                    file:bg-slate-200 file:text-slate-700
+                    hover:file:bg-slate-300 cursor-pointer border border-slate-300 rounded-lg p-1"
+              />
+              {heroImage && (
+                <div className="flex items-center gap-2 mt-2">
+                  <img src={heroImage} alt="Preview Hero" className="w-24 h-16 rounded object-cover bg-white border border-slate-200 p-1" />
+                  <p className="text-[10px] text-slate-500">
+                    Foto tersimpan. <a href={heroImage} target="_blank" rel="noreferrer" className="text-primary underline">Lihat penuh</a>
+                  </p>
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-500">Gambar ukuran besar yang muncul di halaman beranda sebelah kanan.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
           <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
             <span className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
                Nomor Badan Hukum Resmi
@@ -191,6 +327,20 @@ const AdminProfile = () => {
 
           <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
             <span className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+               Misi Koperasi
+            </span>
+            <textarea
+              rows={3}
+              value={misi}
+              onChange={(e) => setMisi(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 font-medium italic text-slate-700 focus:outline-none focus:border-primary text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 text-xs pt-2">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+            <span className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
                Deskripsi Utama
             </span>
             <textarea
@@ -201,15 +351,13 @@ const AdminProfile = () => {
             />
           </div>
         </div>
-      </form>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+        </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
             
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              2. Data Dinamis - Alamat Kantor & Peta Google Maps
+              Alamat
             </h2>
           </div>
 
@@ -258,7 +406,7 @@ const AdminProfile = () => {
           <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
             
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              3. Data Dinamis - Struktur Pengurus & Pengawas Cabang
+              Struktur Pengurus & Pengawas Cabang
             </h2>
           </div>
 
@@ -426,10 +574,11 @@ const AdminProfile = () => {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 text-white font-bold text-xs shadow-sm transition-colors"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 text-white font-bold text-xs shadow-sm transition-colors disabled:opacity-50"
           >
-            
-            <span>Simpan Perubahan Profile</span>
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan Profil'}</span>
           </button>
         </div>
 

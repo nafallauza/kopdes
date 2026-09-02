@@ -58,13 +58,6 @@ const ContactPage = () => {
       <section className="py-16 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-950 via-slate-900 to-slate-950"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-block px-4 py-1 rounded-full bg-red-500/20 text-red-300 text-xs font-bold uppercase mb-4"
-          >
-            Sekretariat & Informasi
-          </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}

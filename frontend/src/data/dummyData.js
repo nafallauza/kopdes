@@ -7,6 +7,7 @@ export const kopdesData = {
   branchName: "Kopdes Merah Putih - Desa Kertamukti",
   tagline: "Membangun Kemandirian Ekonomi Desa Berbasis Gotong Royong",
   logo: logoImg,
+  heroImage: "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80",
 
   // General Description
   description: "Koperasi Desa Merah Putih (Kopdes Merah Putih) adalah lembaga ekonomi desa berbasis gotong royong yang berkomitmen memperkuat kedaulatan pangan, mendampingi UMKM lokal, serta menyediakan layanan usaha terpadu bagi warga desa secara profesional, adil, dan terpercaya.",
