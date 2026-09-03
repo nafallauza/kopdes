@@ -17,8 +17,6 @@ const AdminFooter = () => {
   const [instagram, setInstagram] = useState(kopdesData.kontak?.sosialMedia?.instagram || '');
   const [youtube, setYoutube] = useState(kopdesData.kontak?.sosialMedia?.youtube || '');
 
-  const [isSaving, setIsSaving] = useState(false);
-
   // Sinkronkan state jika data kontak selesai di-fetch dari Supabase
   React.useEffect(() => {
     if (kopdesData?.kontak) {
