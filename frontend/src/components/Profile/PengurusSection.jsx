@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { UserCheck } from 'lucide-react';
 import { useKopdes } from '../../context/KopdesContext';
 import SectionTitle from '../SectionTitle/SectionTitle';
 
@@ -57,11 +56,6 @@ const PengurusSection = () => {
 
                   {/* Name & Title */}
                   <div className="p-5">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary mb-1">
-                      <UserCheck className="w-3.5 h-3.5" />
-                      <span>{data.jabatan}</span>
-                    </div>
-
                     <h4 className="text-base font-bold text-slate-900 line-clamp-1">
                       {data.nama}
                     </h4>
