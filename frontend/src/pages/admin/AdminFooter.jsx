@@ -17,6 +17,8 @@ const AdminFooter = () => {
   const [instagram, setInstagram] = useState(kopdesData.kontak?.sosialMedia?.instagram || '');
   const [youtube, setYoutube] = useState(kopdesData.kontak?.sosialMedia?.youtube || '');
 
+  const [isSaving, setIsSaving] = useState(false);
+
   // Sinkronkan state jika data kontak selesai di-fetch dari Supabase
   React.useEffect(() => {
     if (kopdesData?.kontak) {
@@ -47,10 +49,10 @@ const AdminFooter = () => {
         }
       });
 
-      setSuccessMessage('Data Footer & Kontak Resmi berhasil disimpan!');
+      setSuccessMessage('Data Footer & Kontak Resmi berhasil diperbarui!');
     } catch (err) {
       console.error(err);
-      setSuccessMessage('Perubahan disimpan secara lokal.');
+      alert('Gagal menyimpan footer ke database (perubahan disimpan lokal).');
     } finally {
       setIsSaving(false);
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -189,14 +191,14 @@ const AdminFooter = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-2">
+        <div className="fixed bottom-8 right-8 z-50">
           <button
             type="submit"
             disabled={isSaving}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary hover:bg-primary-700 text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan Footer'}</span>
+            <Save className="w-5 h-5" />
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan'}</span>
           </button>
         </div>
 

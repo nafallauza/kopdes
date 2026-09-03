@@ -23,10 +23,7 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = () => {
-    // Supabase handles session automatically, this function is mostly a placeholder now if needed, 
-    // but actual login is handled via supabase.auth.signInWithPassword in AdminLogin
-  };
+
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -34,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, logout, loading, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

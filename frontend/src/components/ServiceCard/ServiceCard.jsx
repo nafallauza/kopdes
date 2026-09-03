@@ -1,10 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import * as Icons from 'lucide-react';
 import { CheckCircle2 } from 'lucide-react';
 
-const ServiceCard = ({ title, description, iconName, features, index }) => {
-  const IconComponent = Icons[iconName] || Icons.Building2;
+const ServiceCard = ({ title, description, features, index }) => {
 
   return (
     <motion.div
@@ -15,10 +13,7 @@ const ServiceCard = ({ title, description, iconName, features, index }) => {
       className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
     >
       <div>
-        {/* Icon */}
-        <div className="w-12 h-12 rounded-lg bg-red-50 text-primary border border-red-100 flex items-center justify-center mb-4">
-          <IconComponent className="w-6 h-6 stroke-[2]" />
-        </div>
+
 
         {/* Title */}
         <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">

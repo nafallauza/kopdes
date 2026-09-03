@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, CheckCircle2, MapPin, Lock, FileText, UserCheck, Eye, Compass, Target } from 'lucide-react';
+import { Save } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 import { useKopdes } from '../../context/KopdesContext';
 import { useAuth } from '../../context/AuthContext';
@@ -394,7 +394,14 @@ const AdminProfile = () => {
                 <input
                   type="text"
                   value={googleMapsEmbedUrl}
-                  onChange={(e) => setGoogleMapsEmbedUrl(e.target.value)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    const match = val.match(/src="([^"]+)"/);
+                    if (match && match[1]) {
+                      val = match[1];
+                    }
+                    setGoogleMapsEmbedUrl(val);
+                  }}
                   className="w-full px-3 py-2 rounded-lg border border-slate-300 font-medium text-slate-900 focus:outline-none focus:border-primary text-xs"
                 />
               </div>
@@ -571,14 +578,14 @@ const AdminProfile = () => {
           </div>
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="fixed bottom-8 right-8 z-50">
           <button
             type="submit"
             disabled={isSaving}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 text-white font-bold text-xs shadow-sm transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary hover:bg-primary-700 text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan Profil'}</span>
+            <Save className="w-5 h-5" />
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan'}</span>
           </button>
         </div>
 

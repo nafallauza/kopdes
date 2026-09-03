@@ -2,12 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const SectionTitle = ({
-  subtitle,
   title,
   highlight,
   description,
   align = 'center',
-  badge,
   light = false
 }) => {
   const alignClass = align === 'left' ? 'text-left items-start' : 'text-center items-center mx-auto';

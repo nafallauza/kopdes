@@ -57,6 +57,9 @@ export const KopdesProvider = ({ children }) => {
               description: dbData.deskripsi?.trim() || prev.description,
               visi: dbData.visi?.trim() || prev.visi,
               misi: dbData.misi?.trim() || prev.misi,
+              layanan: (Array.isArray(dbData.layanan_json) && dbData.layanan_json.length > 0)
+                ? dbData.layanan_json
+                : prev.layanan,
               legal: {
                 ...prev.legal,
                 ...dbLegal,
@@ -209,29 +212,46 @@ export const KopdesProvider = ({ children }) => {
     }
   };
 
-  // Layanan CRUD (Dinamis)
-  const addLayanan = (newUnit) => {
+  // Layanan CRUD (Dinamis - Sinkronisasi ke Supabase)
+  const _syncLayananToSupabase = async (newLayananArray) => {
+    const { error } = await supabase
+      .from('profil_koperasi')
+      .update({ layanan_json: newLayananArray })
+      .eq('id', 1);
+    if (error) {
+      console.error('Gagal sinkronisasi layanan ke Supabase:', error);
+      throw error;
+    }
+  };
+
+  const addLayanan = async (newUnit) => {
     const unitWithId = {
       ...newUnit,
       id: newUnit.id || `unit-${Date.now()}`,
     };
+    const newLayanan = [...data.layanan, unitWithId];
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: [...prev.layanan, unitWithId]
+      layanan: newLayanan
     }));
   };
 
-  const updateLayanan = (id, updatedUnit) => {
+  const updateLayanan = async (id, updatedUnit) => {
+    const newLayanan = data.layanan.map((item) => (item.id === id ? { ...item, ...updatedUnit } : item));
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: prev.layanan.map((item) => (item.id === id ? { ...item, ...updatedUnit } : item))
+      layanan: newLayanan
     }));
   };
 
-  const deleteLayanan = (id) => {
+  const deleteLayanan = async (id) => {
+    const newLayanan = data.layanan.filter((item) => item.id !== id);
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: prev.layanan.filter((item) => item.id !== id)
+      layanan: newLayanan
     }));
   };
 
@@ -339,9 +359,7 @@ export const KopdesProvider = ({ children }) => {
         })
         .eq('id', 1);
 
-      if (error) {
-        console.warn('Gagal menyimpan kontak ke database Supabase:', error);
-      }
+      if (error) throw error;
 
       setData((prev) => ({
         ...prev,

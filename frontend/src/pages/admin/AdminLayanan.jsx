@@ -12,18 +12,12 @@ const AdminLayanan = () => {
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('Wallet');
   const [featuresText, setFeaturesText] = useState('');
-
-  const iconOptions = [
-    'Wallet', 'ShoppingBag', 'Wheat', 'Tractor', 'Store', 'Truck', 'PiggyBank', 'ShieldCheck', 'Smartphone', 'Building2'
-  ];
 
   const handleOpenAdd = () => {
     setEditingId(null);
     setTitle('');
     setDescription('');
-    setIcon('Wallet');
     setFeaturesText('');
     setModalOpen(true);
   };
@@ -32,20 +26,23 @@ const AdminLayanan = () => {
     setEditingId(unit.id);
     setTitle(unit.title);
     setDescription(unit.description);
-    setIcon(unit.icon || 'Wallet');
-    setFeaturesText(unit.features ? unit.features.join(', ') : '');
+    setFeaturesText(unit.features ? unit.features.map((f, i) => `${i + 1}. ${f}`).join('\n') : '');
     setModalOpen(true);
   };
 
-  const handleDelete = (id, unitTitle) => {
+  const handleDelete = async (id, unitTitle) => {
     if (window.confirm(`Apakah Anda yakin ingin menghapus unit layanan "${unitTitle}"?`)) {
-      deleteLayanan(id);
-      setSuccessMessage(`Unit Layanan "${unitTitle}" berhasil dihapus.`);
-      setTimeout(() => setSuccessMessage(''), 4000);
+      try {
+        await deleteLayanan(id);
+        setSuccessMessage(`Unit Layanan "${unitTitle}" berhasil dihapus.`);
+        setTimeout(() => setSuccessMessage(''), 4000);
+      } catch (e) {
+        alert('Gagal menghapus layanan.');
+      }
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
     if (!title.trim() || !description.trim()) {
@@ -54,26 +51,28 @@ const AdminLayanan = () => {
     }
 
     const featuresArray = featuresText
-      ? featuresText.split(',').map((f) => f.trim()).filter(Boolean)
+      ? featuresText.split('\n').map((f) => f.replace(/^\d+\.\s*/, '').trim()).filter(Boolean)
       : [];
 
     const unitPayload = {
       title,
       description,
-      icon,
       features: featuresArray
     };
 
-    if (editingId) {
-      updateLayanan(editingId, unitPayload);
-      setSuccessMessage(`Unit Layanan "${title}" berhasil diperbarui.`);
-    } else {
-      addLayanan(unitPayload);
-      setSuccessMessage(`Unit Layanan baru "${title}" berhasil ditambahkan.`);
+    try {
+      if (editingId) {
+        await updateLayanan(editingId, unitPayload);
+        setSuccessMessage(`Unit Layanan "${title}" berhasil diperbarui.`);
+      } else {
+        await addLayanan(unitPayload);
+        setSuccessMessage(`Unit Layanan baru "${title}" berhasil ditambahkan.`);
+      }
+      setModalOpen(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    } catch (e) {
+      alert('Gagal menyimpan layanan.');
     }
-
-    setModalOpen(false);
-    setTimeout(() => setSuccessMessage(''), 4000);
   };
 
   return (
@@ -150,8 +149,7 @@ const AdminLayanan = () => {
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Icon: {unit.icon || 'Default'}</span>
+            <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-end text-[11px] text-slate-400">
               <span className="font-semibold text-slate-600">ID: {unit.id}</span>
             </div>
           </div>
@@ -183,18 +181,7 @@ const AdminLayanan = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Pilih Icon Lucide</label>
-                <select
-                  value={icon}
-                  onChange={(e) => setIcon(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 font-medium text-slate-900 focus:outline-none focus:border-primary"
-                >
-                  {iconOptions.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
+
 
               <div>
                 <label className="block font-bold text-slate-800 mb-1">Deskripsi Layanan *</label>
@@ -208,14 +195,26 @@ const AdminLayanan = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Poin Fitur Layanan (Dipisahkan koma)</label>
-                <input
-                  type="text"
+                <label className="block font-bold text-slate-800 mb-1">Poin Fitur Layanan (Gunakan Enter)</label>
+                <textarea
+                  rows={4}
                   value={featuresText}
-                  onChange={(e) => setFeaturesText(e.target.value)}
-                  placeholder="Contoh: Bebas Bunga, Syarat Mudah, Jaminan Aman"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium"
-                />
+                  onChange={(e) => {
+                    let lines = e.target.value.split('\n');
+                    lines = lines.map((line, index) => {
+                      let text = line.replace(/^\d+\.\s*/, '');
+                      return text ? `${index + 1}. ${text}` : `${index + 1}. `;
+                    });
+                    setFeaturesText(lines.join('\n'));
+                  }}
+                  onFocus={(e) => {
+                    if (!featuresText.trim()) {
+                      setFeaturesText('1. ');
+                    }
+                  }}
+                  placeholder="1. Fitur pertama..."
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium focus:outline-none focus:border-primary"
+                ></textarea>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
