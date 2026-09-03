@@ -25,11 +25,11 @@ const FloatingContact = () => {
       transition={{ type: 'spring', stiffness: 260, damping: 20 }}
     >
       <a
-        href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-        target="_blank"
+        href={kopdesData.kontak?.whatsapp ? `https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}` : '#'}
+        target={kopdesData.kontak?.whatsapp ? '_blank' : undefined}
         rel="noopener noreferrer"
         onClick={(e) => {
-          if (isDragging.current) {
+          if (isDragging.current || !kopdesData.kontak?.whatsapp) {
             e.preventDefault();
           }
         }}

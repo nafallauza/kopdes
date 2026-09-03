@@ -69,14 +69,21 @@ const AdminGaleri = () => {
 
       if (mediaType === 'image' && selectedFile) {
         const fileExt = selectedFile.name.split('.').pop() || 'jpg';
-        const fileName = `galeri_${Math.random()}.${fileExt}`;
+        const fileName = `galeri_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
         const filePath = `galeri/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('kopdes_images')
           .upload(filePath, selectedFile);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Storage upload error:', uploadError);
+          if (uploadError.statusCode === '404' || uploadError.message?.toLowerCase().includes('bucket')) {
+            alert('Upload file gagal: Bucket storage "kopdes_images" belum dibuat di Supabase.\n\nTips: Anda dapat memasukkan "URL Gambar online" (misal link Unsplash/link web) pada kolom URL gambar di bawah, atau buat bucket "kopdes_images" (Public) di menu Storage Supabase.');
+            return;
+          }
+          throw uploadError;
+        }
 
         const { data } = supabase.storage
           .from('kopdes_images')
@@ -105,13 +112,12 @@ const AdminGaleri = () => {
         setSuccessMessage(`Item Galeri baru "${title}" berhasil ditambahkan.`);
       }
       
+      setModalOpen(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
     } catch (err) {
       console.error(err);
-      alert('Terjadi kesalahan jaringan atau upload gagal.');
+      alert(`Terjadi kesalahan: ${err.message || 'Gagal menyimpan item galeri'}`);
     }
-
-    setModalOpen(false);
-    setTimeout(() => setSuccessMessage(''), 4000);
   };
 
   const getEmbedUrl = (urlStr) => {
@@ -341,8 +347,30 @@ const AdminGaleri = () => {
                         file:bg-slate-100 file:text-slate-700
                         hover:file:bg-slate-200 cursor-pointer border border-slate-300 rounded-lg p-1.5"
                     />
-                    {url && !selectedFile && (
-                      <p className="text-[10px] text-slate-500">Gambar saat ini: <a href={url} target="_blank" rel="noreferrer" className="text-primary underline">Lihat</a> (Upload file baru untuk menimpa)</p>
+
+                    <div className="flex items-center gap-2 my-1.5">
+                      <div className="h-px bg-slate-200 flex-1"></div>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase">atau masukkan URL gambar online</span>
+                      <div className="h-px bg-slate-200 flex-1"></div>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={selectedFile ? '' : url}
+                      onChange={(e) => {
+                        setSelectedFile(null);
+                        setUrl(e.target.value);
+                      }}
+                      placeholder="https://images.unsplash.com/... atau URL foto langsung"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 font-medium text-slate-900 focus:outline-none focus:border-primary text-xs"
+                    />
+
+                    {url && (
+                      <p className="text-[10px] text-slate-500">
+                        {selectedFile ? 'File foto lokal terpilih' : (
+                          <>URL Gambar saat ini: <a href={url} target="_blank" rel="noreferrer" className="text-primary underline font-bold">Lihat Preview</a></>
+                        )}
+                      </p>
                     )}
                   </div>
                 )}

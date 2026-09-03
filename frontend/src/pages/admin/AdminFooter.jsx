@@ -5,34 +5,56 @@ import { useKopdes } from '../../context/KopdesContext';
 const AdminFooter = () => {
   const { kopdesData, updateFooter } = useKopdes();
   const [successMessage, setSuccessMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form State
-  const [telepon, setTelepon] = useState(kopdesData.kontak.telepon);
-  const [whatsapp, setWhatsapp] = useState(kopdesData.kontak.whatsapp);
-  const [email, setEmail] = useState(kopdesData.kontak.email);
-  const [jamKerja, setJamKerja] = useState(kopdesData.kontak.jamKerja);
+  const [telepon, setTelepon] = useState(kopdesData.kontak?.telepon || '');
+  const [whatsapp, setWhatsapp] = useState(kopdesData.kontak?.whatsapp || '');
+  const [email, setEmail] = useState(kopdesData.kontak?.email || '');
+  const [jamKerja, setJamKerja] = useState(kopdesData.kontak?.jamKerja || '');
 
-  const [facebook, setFacebook] = useState(kopdesData.kontak.sosialMedia?.facebook || '');
-  const [instagram, setInstagram] = useState(kopdesData.kontak.sosialMedia?.instagram || '');
-  const [youtube, setYoutube] = useState(kopdesData.kontak.sosialMedia?.youtube || '');
+  const [facebook, setFacebook] = useState(kopdesData.kontak?.sosialMedia?.facebook || '');
+  const [instagram, setInstagram] = useState(kopdesData.kontak?.sosialMedia?.instagram || '');
+  const [youtube, setYoutube] = useState(kopdesData.kontak?.sosialMedia?.youtube || '');
 
-  const handleSubmit = (e) => {
+  // Sinkronkan state jika data kontak selesai di-fetch dari Supabase
+  React.useEffect(() => {
+    if (kopdesData?.kontak) {
+      setTelepon(kopdesData.kontak.telepon || '');
+      setWhatsapp(kopdesData.kontak.whatsapp || '');
+      setEmail(kopdesData.kontak.email || '');
+      setJamKerja(kopdesData.kontak.jamKerja || '');
+      setFacebook(kopdesData.kontak.sosialMedia?.facebook || '');
+      setInstagram(kopdesData.kontak.sosialMedia?.instagram || '');
+      setYoutube(kopdesData.kontak.sosialMedia?.youtube || '');
+    }
+  }, [kopdesData]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
 
-    updateFooter({
-      telepon,
-      whatsapp,
-      email,
-      jamKerja,
-      sosialMedia: {
-        facebook,
-        instagram,
-        youtube
-      }
-    });
+    try {
+      await updateFooter({
+        telepon,
+        whatsapp,
+        email,
+        jamKerja,
+        sosialMedia: {
+          facebook,
+          instagram,
+          youtube
+        }
+      });
 
-    setSuccessMessage('Data Footer & Kontak Resmi berhasil diperbarui!');
-    setTimeout(() => setSuccessMessage(''), 4000);
+      setSuccessMessage('Data Footer & Kontak Resmi berhasil disimpan!');
+    } catch (err) {
+      console.error(err);
+      setSuccessMessage('Perubahan disimpan secara lokal.');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    }
   };
 
   return (
@@ -170,10 +192,11 @@ const AdminFooter = () => {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 text-white font-bold text-xs shadow-sm transition-colors"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition-colors"
           >
             <Save className="w-4 h-4" />
-            <span>Simpan Perubahan Footer</span>
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan Footer'}</span>
           </button>
         </div>
 

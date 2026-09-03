@@ -78,15 +78,17 @@ const Footer = () => {
             <div className="space-y-2.5 text-xs sm:text-sm text-slate-400">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                <span>{kopdesData.kontak?.alamat}</span>
+                <span>{kopdesData.kontak?.alamat || 'Alamat sekretariat belum diatur'}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <span>{kopdesData.kontak?.telepon} / {kopdesData.kontak?.whatsapp}</span>
+                <span>
+                  {[kopdesData.kontak?.telepon, kopdesData.kontak?.whatsapp].filter(Boolean).join(' / ') || 'Kontak belum diatur'}
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <span>{kopdesData.kontak?.email}</span>
+                <span>{kopdesData.kontak?.email || 'info@kopdes.id'}</span>
               </div>
             </div>
 
@@ -95,29 +97,32 @@ const Footer = () => {
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Media Sosial Resmi</p>
               <div className="flex items-center gap-2.5">
                 <a
-                  href={kopdesData.kontak?.sosialMedia?.facebook}
-                  target="_blank"
+                  href={kopdesData.kontak?.sosialMedia?.facebook || '#'}
+                  target={kopdesData.kontak?.sosialMedia?.facebook ? '_blank' : undefined}
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded bg-slate-800 text-slate-300 hover:text-white hover:bg-primary transition-colors flex items-center justify-center"
                   aria-label="Facebook"
+                  onClick={(e) => !kopdesData.kontak?.sosialMedia?.facebook && e.preventDefault()}
                 >
                   <Facebook className="w-4 h-4" />
                 </a>
                 <a
-                  href={kopdesData.kontak?.sosialMedia?.instagram}
-                  target="_blank"
+                  href={kopdesData.kontak?.sosialMedia?.instagram || '#'}
+                  target={kopdesData.kontak?.sosialMedia?.instagram ? '_blank' : undefined}
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded bg-slate-800 text-slate-300 hover:text-white hover:bg-primary transition-colors flex items-center justify-center"
                   aria-label="Instagram"
+                  onClick={(e) => !kopdesData.kontak?.sosialMedia?.instagram && e.preventDefault()}
                 >
                   <Instagram className="w-4 h-4" />
                 </a>
                 <a
-                  href={kopdesData.kontak?.sosialMedia?.youtube}
-                  target="_blank"
+                  href={kopdesData.kontak?.sosialMedia?.youtube || '#'}
+                  target={kopdesData.kontak?.sosialMedia?.youtube ? '_blank' : undefined}
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded bg-slate-800 text-slate-300 hover:text-white hover:bg-primary transition-colors flex items-center justify-center"
                   aria-label="YouTube"
+                  onClick={(e) => !kopdesData.kontak?.sosialMedia?.youtube && e.preventDefault()}
                 >
                   <Youtube className="w-4 h-4" />
                 </a>

@@ -45,26 +45,81 @@ export const KopdesProvider = ({ children }) => {
 
         if (galeriError) throw galeriError;
 
-        setData(prev => ({
-          ...prev,
-          ...(dbData ? {
-            namaKoperasi: dbData.nama_koperasi,
-            description: dbData.deskripsi,
-            visi: dbData.visi,
-            misi: dbData.misi,
-            legal: dbData.legal_json || prev.legal,
-            kontak: dbData.kontak_json || prev.kontak,
-            pengurus: dbData.pengurus_json || prev.pengurus,
-          } : {}),
-          galeri: galeriData ? galeriData.map(g => ({
-            id: g.id,
-            mediaType: g.media_type,
-            title: g.title,
-            caption: g.caption,
-            url: g.url,
-            date: g.date
-          })) : prev.galeri
-        }));
+        setData(prev => {
+          const dbKontak = dbData?.kontak_json || {};
+          const dbPengurus = dbData?.pengurus_json || {};
+          const dbLegal = dbData?.legal_json || {};
+
+          return {
+            ...prev,
+            ...(dbData ? {
+              namaKoperasi: dbData.nama_koperasi?.trim() || prev.namaKoperasi,
+              description: dbData.deskripsi?.trim() || prev.description,
+              visi: dbData.visi?.trim() || prev.visi,
+              misi: dbData.misi?.trim() || prev.misi,
+              legal: {
+                ...prev.legal,
+                ...dbLegal,
+                badanHukum: dbLegal.badanHukum?.trim() || prev.legal?.badanHukum,
+                wilayahKerja: dbLegal.wilayahKerja?.trim() || prev.legal?.wilayahKerja,
+                statusKeanggotaan: dbLegal.statusKeanggotaan?.trim() || prev.legal?.statusKeanggotaan,
+              },
+              kontak: {
+                ...prev.kontak,
+                ...dbKontak,
+                alamat: dbKontak.alamat?.trim() || prev.kontak?.alamat,
+                telepon: dbKontak.telepon?.trim() || prev.kontak?.telepon,
+                whatsapp: dbKontak.whatsapp?.trim() || prev.kontak?.whatsapp,
+                email: dbKontak.email?.trim() || prev.kontak?.email,
+                jamKerja: dbKontak.jamKerja?.trim() || prev.kontak?.jamKerja,
+                googleMapsLink: dbKontak.googleMapsLink?.trim() || prev.kontak?.googleMapsLink,
+                googleMapsEmbedUrl: dbKontak.googleMapsEmbedUrl?.trim() || prev.kontak?.googleMapsEmbedUrl,
+                sosialMedia: {
+                  ...prev.kontak?.sosialMedia,
+                  ...(dbKontak.sosialMedia || {})
+                }
+              },
+              pengurus: {
+                ketua: {
+                  ...prev.pengurus?.ketua,
+                  ...(dbPengurus.ketua || {}),
+                  nama: dbPengurus.ketua?.nama?.trim() || prev.pengurus?.ketua?.nama,
+                  foto: dbPengurus.ketua?.foto?.trim() || prev.pengurus?.ketua?.foto,
+                  pesan: dbPengurus.ketua?.pesan?.trim() || prev.pengurus?.ketua?.pesan,
+                },
+                sekretaris: {
+                  ...prev.pengurus?.sekretaris,
+                  ...(dbPengurus.sekretaris || {}),
+                  nama: dbPengurus.sekretaris?.nama?.trim() || prev.pengurus?.sekretaris?.nama,
+                  foto: dbPengurus.sekretaris?.foto?.trim() || prev.pengurus?.sekretaris?.foto,
+                  pesan: dbPengurus.sekretaris?.pesan?.trim() || prev.pengurus?.sekretaris?.pesan,
+                },
+                bendahara: {
+                  ...prev.pengurus?.bendahara,
+                  ...(dbPengurus.bendahara || {}),
+                  nama: dbPengurus.bendahara?.nama?.trim() || prev.pengurus?.bendahara?.nama,
+                  foto: dbPengurus.bendahara?.foto?.trim() || prev.pengurus?.bendahara?.foto,
+                  pesan: dbPengurus.bendahara?.pesan?.trim() || prev.pengurus?.bendahara?.pesan,
+                },
+                pengawas: {
+                  ...prev.pengurus?.pengawas,
+                  ...(dbPengurus.pengawas || {}),
+                  nama: dbPengurus.pengawas?.nama?.trim() || prev.pengurus?.pengawas?.nama,
+                  foto: dbPengurus.pengawas?.foto?.trim() || prev.pengurus?.pengawas?.foto,
+                  pesan: dbPengurus.pengawas?.pesan?.trim() || prev.pengurus?.pengawas?.pesan,
+                },
+              }
+            } : {}),
+            galeri: (galeriData && galeriData.length > 0) ? galeriData.map(g => ({
+              id: g.id,
+              mediaType: g.media_type,
+              title: g.title,
+              caption: g.caption,
+              url: g.url,
+              date: g.date
+            })) : prev.galeri
+          };
+        });
       } catch (e) {
         console.error('Gagal mengambil data dari server:', e);
       }
@@ -262,21 +317,54 @@ export const KopdesProvider = ({ children }) => {
   };
 
   // Footer Update (Dinamis: No Telp, Email, Sosmed)
-  const updateFooter = (updatedFooter) => {
-    setData((prev) => ({
-      ...prev,
-      kontak: {
-        ...prev.kontak,
-        telepon: updatedFooter.telepon ?? prev.kontak.telepon,
-        whatsapp: updatedFooter.whatsapp ?? prev.kontak.whatsapp,
-        email: updatedFooter.email ?? prev.kontak.email,
-        jamKerja: updatedFooter.jamKerja ?? prev.kontak.jamKerja,
+  const updateFooter = async (updatedFooter) => {
+    try {
+      const kontak = {
+        ...data.kontak,
+        telepon: updatedFooter.telepon ?? data.kontak.telepon,
+        whatsapp: updatedFooter.whatsapp ?? data.kontak.whatsapp,
+        email: updatedFooter.email ?? data.kontak.email,
+        jamKerja: updatedFooter.jamKerja ?? data.kontak.jamKerja,
         sosialMedia: {
-          ...prev.kontak.sosialMedia,
+          ...data.kontak.sosialMedia,
           ...(updatedFooter.sosialMedia || {})
         }
+      };
+
+      const { error } = await supabase
+        .from('profil_koperasi')
+        .update({
+          kontak_json: kontak,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1);
+
+      if (error) {
+        console.warn('Gagal menyimpan kontak ke database Supabase:', error);
       }
-    }));
+
+      setData((prev) => ({
+        ...prev,
+        kontak
+      }));
+    } catch (err) {
+      console.error('Error saat updateFooter:', err);
+      setData((prev) => ({
+        ...prev,
+        kontak: {
+          ...prev.kontak,
+          telepon: updatedFooter.telepon ?? prev.kontak.telepon,
+          whatsapp: updatedFooter.whatsapp ?? prev.kontak.whatsapp,
+          email: updatedFooter.email ?? prev.kontak.email,
+          jamKerja: updatedFooter.jamKerja ?? prev.kontak.jamKerja,
+          sosialMedia: {
+            ...prev.kontak.sosialMedia,
+            ...(updatedFooter.sosialMedia || {})
+          }
+        }
+      }));
+      throw err;
+    }
   };
 
   // Reset to default initialData

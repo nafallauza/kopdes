@@ -68,17 +68,29 @@ const Gallery = () => {
             badge="Dokumentasi Resmi"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {kopdesData.galeri.map((item, index) => (
-              <GalleryCard
-                key={item.id}
-                item={item}
-                index={index}
-                onClick={(selected) => setActiveItem(selected)}
-                getEmbedUrl={getEmbedUrl}
-              />
-            ))}
-          </div>
+          {(!kopdesData.galeri || kopdesData.galeri.length === 0) ? (
+            <div className="text-center py-16 bg-white rounded-xl border border-slate-200 p-8 max-w-md mx-auto shadow-sm">
+              <div className="w-14 h-14 bg-red-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900 mb-1">Belum Ada Dokumentasi</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Dokumentasi kegiatan dan momen lapangan koperasi akan segera diperbarui.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {kopdesData.galeri.map((item, index) => (
+                <GalleryCard
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onClick={(selected) => setActiveItem(selected)}
+                  getEmbedUrl={getEmbedUrl}
+                />
+              ))}
+            </div>
+          )}
 
         </div>
       </section>

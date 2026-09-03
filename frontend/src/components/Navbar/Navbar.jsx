@@ -84,10 +84,11 @@ const Navbar = () => {
           {/* CTA Right Button */}
           <div className="hidden md:flex items-center gap-3">
             <a
-              href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-              target="_blank"
+              href={kopdesData.kontak?.whatsapp ? `https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}` : '#'}
+              target={kopdesData.kontak?.whatsapp ? '_blank' : undefined}
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-700 shadow-sm transition-colors"
+              onClick={(e) => !kopdesData.kontak?.whatsapp && e.preventDefault()}
             >
               <Phone className="w-3.5 h-3.5" />
               <span>Hubungi Pengurus</span>
@@ -139,10 +140,11 @@ const Navbar = () => {
 
               <div className="pt-3 border-t border-slate-100">
                 <a
-                  href={`https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}`}
-                  target="_blank"
+                  href={kopdesData.kontak?.whatsapp ? `https://wa.me/${kopdesData.kontak.whatsapp.replace(/[^0-9]/g, '')}` : '#'}
+                  target={kopdesData.kontak?.whatsapp ? '_blank' : undefined}
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-white text-xs font-bold bg-primary shadow-sm"
+                  onClick={(e) => !kopdesData.kontak?.whatsapp && e.preventDefault()}
                 >
                   <Phone className="w-4 h-4" />
                   <span>Hubungi Pengurus WhatsApp</span>
