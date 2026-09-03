@@ -38,7 +38,7 @@ const Navbar = () => {
 
     const handleScrollSection = () => {
       const scrollPos = window.scrollY + 180;
-      const sectionIds = ['struktur', 'visi-misi', 'tentang'];
+      const sectionIds = ['struktur', 'legalitas', 'visi-misi', 'tentang'];
 
       for (const id of sectionIds) {
         const el = document.getElementById(id);
@@ -81,6 +81,7 @@ const Navbar = () => {
     { name: "Beranda", href: "/", type: "route" },
     { name: "Tentang", href: "/#tentang", sectionId: "tentang", type: "hash" },
     { name: "Visi & Misi", href: "/#visi-misi", sectionId: "visi-misi", type: "hash" },
+    { name: "Legalitas", href: "/#legalitas", sectionId: "legalitas", type: "hash" },
     { name: "Struktur", href: "/#struktur", sectionId: "struktur", type: "hash" },
     { name: "Layanan", href: "/layanan", type: "route" },
     { name: "Galeri", href: "/galeri", type: "route" },
