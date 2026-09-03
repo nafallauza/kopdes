@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import SectionTitle from '../components/SectionTitle/SectionTitle';
 import CTA from '../components/CTA/CTA';
 import { servicesData, faqData } from '../data/dummyData';
-import * as Icons from 'lucide-react';
+
 import { CheckCircle2, ArrowRight, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -38,7 +38,6 @@ const Services = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {servicesData.map((service, index) => {
-              const IconComp = Icons[service.icon] || Icons.Wallet;
               return (
                 <motion.div
                   key={service.id}
@@ -49,10 +48,7 @@ const Services = () => {
                   className="bg-white rounded-3xl border border-slate-100 p-8 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center shadow-sm">
-                        <IconComp className="w-7 h-7 stroke-[2]" />
-                      </div>
+                    <div className="flex items-center justify-end mb-6">
                       <span className="px-3 py-1 rounded-full bg-accent-50 text-amber-700 text-xs font-bold border border-amber-200">
                         {service.badge}
                       </span>

@@ -12,18 +12,12 @@ const AdminLayanan = () => {
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('Wallet');
   const [featuresText, setFeaturesText] = useState('');
-
-  const iconOptions = [
-    'Wallet', 'ShoppingBag', 'Wheat', 'Tractor', 'Store', 'Truck', 'PiggyBank', 'ShieldCheck', 'Smartphone', 'Building2'
-  ];
 
   const handleOpenAdd = () => {
     setEditingId(null);
     setTitle('');
     setDescription('');
-    setIcon('Wallet');
     setFeaturesText('');
     setModalOpen(true);
   };
@@ -32,7 +26,6 @@ const AdminLayanan = () => {
     setEditingId(unit.id);
     setTitle(unit.title);
     setDescription(unit.description);
-    setIcon(unit.icon || 'Wallet');
     setFeaturesText(unit.features ? unit.features.map((f, i) => `${i + 1}. ${f}`).join('\n') : '');
     setModalOpen(true);
   };
@@ -64,7 +57,6 @@ const AdminLayanan = () => {
     const unitPayload = {
       title,
       description,
-      icon,
       features: featuresArray
     };
 
@@ -157,8 +149,7 @@ const AdminLayanan = () => {
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Icon: {unit.icon || 'Default'}</span>
+            <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-end text-[11px] text-slate-400">
               <span className="font-semibold text-slate-600">ID: {unit.id}</span>
             </div>
           </div>
@@ -190,18 +181,7 @@ const AdminLayanan = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Pilih Icon Lucide</label>
-                <select
-                  value={icon}
-                  onChange={(e) => setIcon(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 font-medium text-slate-900 focus:outline-none focus:border-primary"
-                >
-                  {iconOptions.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
+
 
               <div>
                 <label className="block font-bold text-slate-800 mb-1">Deskripsi Layanan *</label>
