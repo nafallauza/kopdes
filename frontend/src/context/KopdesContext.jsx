@@ -49,6 +49,7 @@ export const KopdesProvider = ({ children }) => {
           ...prev,
           ...(dbData ? {
             namaKoperasi: dbData.nama_koperasi,
+            heroImage: dbData.logo_url || prev.heroImage,
             description: dbData.deskripsi,
             visi: dbData.visi,
             misi: dbData.misi,
@@ -129,6 +130,7 @@ export const KopdesProvider = ({ children }) => {
         .from('profil_koperasi')
         .update({
           nama_koperasi: namaKoperasi,
+          logo_url: heroImage,
           deskripsi: description,
           visi: visi,
           misi: misi,
