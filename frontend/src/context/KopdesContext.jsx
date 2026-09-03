@@ -54,6 +54,7 @@ export const KopdesProvider = ({ children }) => {
             ...prev,
             ...(dbData ? {
               namaKoperasi: dbData.nama_koperasi?.trim() || prev.namaKoperasi,
+              heroImage: dbData.logo_url || prev.heroImage,
               description: dbData.deskripsi?.trim() || prev.description,
               visi: dbData.visi?.trim() || prev.visi,
               misi: dbData.misi?.trim() || prev.misi,
@@ -187,6 +188,7 @@ export const KopdesProvider = ({ children }) => {
         .from('profil_koperasi')
         .update({
           nama_koperasi: namaKoperasi,
+          logo_url: heroImage,
           deskripsi: description,
           visi: visi,
           misi: misi,
