@@ -16,23 +16,31 @@ const AdminFooter = () => {
   const [instagram, setInstagram] = useState(kopdesData.kontak.sosialMedia?.instagram || '');
   const [youtube, setYoutube] = useState(kopdesData.kontak.sosialMedia?.youtube || '');
 
-  const handleSubmit = (e) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
+    try {
+      await updateFooter({
+        telepon,
+        whatsapp,
+        email,
+        jamKerja,
+        sosialMedia: {
+          facebook,
+          instagram,
+          youtube
+        }
+      });
 
-    updateFooter({
-      telepon,
-      whatsapp,
-      email,
-      jamKerja,
-      sosialMedia: {
-        facebook,
-        instagram,
-        youtube
-      }
-    });
-
-    setSuccessMessage('Data Footer & Kontak Resmi berhasil diperbarui!');
-    setTimeout(() => setSuccessMessage(''), 4000);
+      setSuccessMessage('Data Footer & Kontak Resmi berhasil diperbarui!');
+    } catch (error) {
+      alert('Gagal menyimpan footer');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    }
   };
 
   return (
@@ -167,13 +175,14 @@ const AdminFooter = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-2">
+        <div className="fixed bottom-8 right-8 z-50">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-700 text-white font-bold text-xs shadow-sm transition-colors"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary hover:bg-primary-700 text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>Simpan Perubahan Footer</span>
+            <Save className="w-5 h-5" />
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan'}</span>
           </button>
         </div>
 

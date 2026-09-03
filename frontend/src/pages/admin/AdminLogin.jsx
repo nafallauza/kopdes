@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useKopdes } from '../../context/KopdesContext';
 import { supabase } from '../../config/supabaseClient';
 
 const AdminLogin = () => {
-  const { login } = useAuth();
   const { kopdesData } = useKopdes();
   const navigate = useNavigate();
 

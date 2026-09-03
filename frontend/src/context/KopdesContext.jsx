@@ -154,29 +154,46 @@ export const KopdesProvider = ({ children }) => {
     }
   };
 
-  // Layanan CRUD (Dinamis)
-  const addLayanan = (newUnit) => {
+  // Layanan CRUD (Dinamis - Sinkronisasi ke Supabase)
+  const _syncLayananToSupabase = async (newLayananArray) => {
+    const { error } = await supabase
+      .from('profil_koperasi')
+      .update({ layanan_json: newLayananArray })
+      .eq('id', 1);
+    if (error) {
+      console.error('Gagal sinkronisasi layanan ke Supabase:', error);
+      throw error;
+    }
+  };
+
+  const addLayanan = async (newUnit) => {
     const unitWithId = {
       ...newUnit,
       id: newUnit.id || `unit-${Date.now()}`,
     };
+    const newLayanan = [...data.layanan, unitWithId];
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: [...prev.layanan, unitWithId]
+      layanan: newLayanan
     }));
   };
 
-  const updateLayanan = (id, updatedUnit) => {
+  const updateLayanan = async (id, updatedUnit) => {
+    const newLayanan = data.layanan.map((item) => (item.id === id ? { ...item, ...updatedUnit } : item));
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: prev.layanan.map((item) => (item.id === id ? { ...item, ...updatedUnit } : item))
+      layanan: newLayanan
     }));
   };
 
-  const deleteLayanan = (id) => {
+  const deleteLayanan = async (id) => {
+    const newLayanan = data.layanan.filter((item) => item.id !== id);
+    await _syncLayananToSupabase(newLayanan);
     setData((prev) => ({
       ...prev,
-      layanan: prev.layanan.filter((item) => item.id !== id)
+      layanan: newLayanan
     }));
   };
 
@@ -262,21 +279,38 @@ export const KopdesProvider = ({ children }) => {
   };
 
   // Footer Update (Dinamis: No Telp, Email, Sosmed)
-  const updateFooter = (updatedFooter) => {
-    setData((prev) => ({
-      ...prev,
-      kontak: {
-        ...prev.kontak,
-        telepon: updatedFooter.telepon ?? prev.kontak.telepon,
-        whatsapp: updatedFooter.whatsapp ?? prev.kontak.whatsapp,
-        email: updatedFooter.email ?? prev.kontak.email,
-        jamKerja: updatedFooter.jamKerja ?? prev.kontak.jamKerja,
+  const updateFooter = async (updatedFooter) => {
+    try {
+      const kontak = {
+        ...data.kontak,
+        telepon: updatedFooter.telepon ?? data.kontak.telepon,
+        whatsapp: updatedFooter.whatsapp ?? data.kontak.whatsapp,
+        email: updatedFooter.email ?? data.kontak.email,
+        jamKerja: updatedFooter.jamKerja ?? data.kontak.jamKerja,
         sosialMedia: {
-          ...prev.kontak.sosialMedia,
+          ...data.kontak.sosialMedia,
           ...(updatedFooter.sosialMedia || {})
         }
-      }
-    }));
+      };
+
+      const { error } = await supabase
+        .from('profil_koperasi')
+        .update({
+          kontak_json: kontak,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1);
+
+      if (error) throw error;
+
+      setData((prev) => ({
+        ...prev,
+        kontak
+      }));
+    } catch (err) {
+      console.error('Gagal update footer:', err);
+      throw err;
+    }
   };
 
   // Reset to default initialData

@@ -33,19 +33,23 @@ const AdminLayanan = () => {
     setTitle(unit.title);
     setDescription(unit.description);
     setIcon(unit.icon || 'Wallet');
-    setFeaturesText(unit.features ? unit.features.join(', ') : '');
+    setFeaturesText(unit.features ? unit.features.map((f, i) => `${i + 1}. ${f}`).join('\n') : '');
     setModalOpen(true);
   };
 
-  const handleDelete = (id, unitTitle) => {
+  const handleDelete = async (id, unitTitle) => {
     if (window.confirm(`Apakah Anda yakin ingin menghapus unit layanan "${unitTitle}"?`)) {
-      deleteLayanan(id);
-      setSuccessMessage(`Unit Layanan "${unitTitle}" berhasil dihapus.`);
-      setTimeout(() => setSuccessMessage(''), 4000);
+      try {
+        await deleteLayanan(id);
+        setSuccessMessage(`Unit Layanan "${unitTitle}" berhasil dihapus.`);
+        setTimeout(() => setSuccessMessage(''), 4000);
+      } catch (e) {
+        alert('Gagal menghapus layanan.');
+      }
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
     if (!title.trim() || !description.trim()) {
@@ -54,7 +58,7 @@ const AdminLayanan = () => {
     }
 
     const featuresArray = featuresText
-      ? featuresText.split(',').map((f) => f.trim()).filter(Boolean)
+      ? featuresText.split('\n').map((f) => f.replace(/^\d+\.\s*/, '').trim()).filter(Boolean)
       : [];
 
     const unitPayload = {
@@ -64,16 +68,19 @@ const AdminLayanan = () => {
       features: featuresArray
     };
 
-    if (editingId) {
-      updateLayanan(editingId, unitPayload);
-      setSuccessMessage(`Unit Layanan "${title}" berhasil diperbarui.`);
-    } else {
-      addLayanan(unitPayload);
-      setSuccessMessage(`Unit Layanan baru "${title}" berhasil ditambahkan.`);
+    try {
+      if (editingId) {
+        await updateLayanan(editingId, unitPayload);
+        setSuccessMessage(`Unit Layanan "${title}" berhasil diperbarui.`);
+      } else {
+        await addLayanan(unitPayload);
+        setSuccessMessage(`Unit Layanan baru "${title}" berhasil ditambahkan.`);
+      }
+      setModalOpen(false);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    } catch (e) {
+      alert('Gagal menyimpan layanan.');
     }
-
-    setModalOpen(false);
-    setTimeout(() => setSuccessMessage(''), 4000);
   };
 
   return (
@@ -208,14 +215,26 @@ const AdminLayanan = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Poin Fitur Layanan (Dipisahkan koma)</label>
-                <input
-                  type="text"
+                <label className="block font-bold text-slate-800 mb-1">Poin Fitur Layanan (Gunakan Enter)</label>
+                <textarea
+                  rows={4}
                   value={featuresText}
-                  onChange={(e) => setFeaturesText(e.target.value)}
-                  placeholder="Contoh: Bebas Bunga, Syarat Mudah, Jaminan Aman"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium"
-                />
+                  onChange={(e) => {
+                    let lines = e.target.value.split('\n');
+                    lines = lines.map((line, index) => {
+                      let text = line.replace(/^\d+\.\s*/, '');
+                      return text ? `${index + 1}. ${text}` : `${index + 1}. `;
+                    });
+                    setFeaturesText(lines.join('\n'));
+                  }}
+                  onFocus={(e) => {
+                    if (!featuresText.trim()) {
+                      setFeaturesText('1. ');
+                    }
+                  }}
+                  placeholder="1. Fitur pertama..."
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium focus:outline-none focus:border-primary"
+                ></textarea>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
