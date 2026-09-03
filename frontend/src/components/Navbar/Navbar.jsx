@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import { useKopdes } from '../../context/KopdesContext';
@@ -8,7 +8,9 @@ const Navbar = () => {
   const { kopdesData } = useKopdes();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,11 +29,96 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Scrollspy untuk mendeteksi section yang sedang dilihat di halaman Beranda
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      return;
+    }
+
+    const handleScrollSection = () => {
+      const scrollPos = window.scrollY + 180;
+      const sectionIds = ['struktur', 'visi-misi', 'tentang'];
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPos >= top) {
+            setActiveSection(id);
+            return;
+          }
+        }
+      }
+
+      if (window.scrollY < 250) {
+        setActiveSection('beranda');
+      } else {
+        setActiveSection('');
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollSection);
+    handleScrollSection();
+    return () => window.removeEventListener('scroll', handleScrollSection);
+  }, [location.pathname]);
+
+  // Handle auto-scroll jika navigasi datang dari halaman lain dengan hash (#tentang, dll)
+  useEffect(() => {
+    if (location.pathname === '/' && location.hash) {
+      const targetId = location.hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, location.hash]);
+
   const navItems = [
-    { name: "Profil", href: "/" },
-    { name: "Layanan", href: "/layanan" },
-    { name: "Galeri", href: "/galeri" },
+    { name: "Beranda", href: "/", type: "route" },
+    { name: "Tentang", href: "/#tentang", sectionId: "tentang", type: "hash" },
+    { name: "Visi & Misi", href: "/#visi-misi", sectionId: "visi-misi", type: "hash" },
+    { name: "Struktur", href: "/#struktur", sectionId: "struktur", type: "hash" },
+    { name: "Layanan", href: "/layanan", type: "route" },
+    { name: "Galeri", href: "/galeri", type: "route" },
   ];
+
+  const handleNavClick = (e, item) => {
+    setMobileMenuOpen(false);
+
+    if (item.type === 'hash') {
+      e.preventDefault();
+      if (location.pathname === '/') {
+        const el = document.getElementById(item.sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        navigate(`/#${item.sectionId}`);
+      }
+    } else if (item.href === '/') {
+      if (location.pathname === '/') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  const isItemActive = (item) => {
+    if (location.pathname === '/') {
+      if (item.type === 'hash') {
+        return activeSection === item.sectionId;
+      }
+      if (item.href === '/') {
+        return activeSection === 'beranda' || !activeSection;
+      }
+      return false;
+    }
+    return location.pathname === item.href;
+  };
 
   return (
     <header
@@ -64,13 +151,14 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
+              const active = isItemActive(item);
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                    isActive
+                  onClick={(e) => handleNavClick(e, item)}
+                  className={`px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition-colors ${
+                    active
                       ? 'text-primary bg-red-50 border border-red-100'
                       : 'text-slate-700 hover:text-primary hover:bg-slate-50'
                   }`}
@@ -107,19 +195,20 @@ const Navbar = () => {
           >
             <div className="px-4 pt-3 pb-6 space-y-1.5">
               {navItems.map((item) => {
-                const isActive = location.pathname === item.href;
+                const active = isItemActive(item);
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
+                    onClick={(e) => handleNavClick(e, item)}
                     className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
-                      isActive
+                      active
                         ? 'bg-red-50 text-primary border border-red-100'
                         : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <span>{item.name}</span>
-                    <ChevronRight className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
+                    <ChevronRight className={`w-4 h-4 ${active ? 'text-primary' : 'text-slate-400'}`} />
                   </Link>
                 );
               })}

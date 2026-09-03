@@ -35,7 +35,7 @@ const Hero = () => {
             {/* Action CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto mb-8">
               <a
-                href="#profil-section"
+                href="#tentang"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-bold text-white bg-primary hover:bg-primary-700 shadow-sm transition-colors"
               >
                 <span>Profil Selengkapnya</span>
