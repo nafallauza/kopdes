@@ -45,3 +45,5 @@ Semua data pada *website* bersifat dinamis dan dapat diubah langsung oleh admin 
 - **Galeri Kegiatan:** Mengunggah dan menghapus foto-foto kegiatan koperasi langsung ke Supabase Storage.
 
 # kdmpsidomulyo
+
+# kdmpguwosari
