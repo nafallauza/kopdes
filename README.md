@@ -43,3 +43,5 @@ Semua data pada *website* bersifat dinamis dan dapat diubah langsung oleh admin 
 - **Pengurus:** Menambahkan daftar pengurus (Ketua, Sekretaris, Bendahara, Pengawas) beserta foto dan pesan singkat.
 - **Layanan Usaha:** Menambah/mengedit unit layanan usaha koperasi.
 - **Galeri Kegiatan:** Mengunggah dan menghapus foto-foto kegiatan koperasi langsung ke Supabase Storage.
+
+# kdmpsidomulyo
