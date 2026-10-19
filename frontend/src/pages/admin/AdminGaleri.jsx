@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, CheckCircle2, Save, X, Image as ImageIcon, Video }
 import imageCompression from 'browser-image-compression';
 import { useKopdes } from '../../context/KopdesContext';
 import { supabase } from '../../config/supabaseClient';
+import ToastNotification from '../../components/admin/ToastNotification';
 
 const AdminGaleri = () => {
   const { kopdesData, addGaleri, updateGaleri, deleteGaleri } = useKopdes();
@@ -174,12 +175,10 @@ const AdminGaleri = () => {
         </button>
       </div>
 
-      {successMessage && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          
-          <span>{successMessage}</span>
-        </div>
-      )}
+      <ToastNotification 
+        message={successMessage} 
+        onClose={() => setSuccessMessage('')} 
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {kopdesData.galeri.map((item) => (

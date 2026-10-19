@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, CheckCircle2, Save, X, Building2 } from 'lucide-react';
 import { useKopdes } from '../../context/KopdesContext';
+import ToastNotification from '../../components/admin/ToastNotification';
 
 const AdminLayanan = () => {
   const { kopdesData, addLayanan, updateLayanan, deleteLayanan } = useKopdes();
@@ -96,12 +97,10 @@ const AdminLayanan = () => {
         </button>
       </div>
 
-      {successMessage && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>{successMessage}</span>
-        </div>
-      )}
+      <ToastNotification 
+        message={successMessage} 
+        onClose={() => setSuccessMessage('')} 
+      />
 
       {/* Services List Table / Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

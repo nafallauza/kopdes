@@ -133,19 +133,39 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">Ketua</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-bold uppercase">Ketua</span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${kopdesData.pengurus.ketua?.isActive !== false ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>
+                  {kopdesData.pengurus.ketua?.isActive !== false ? 'Tampil' : 'Off'}
+                </span>
+              </div>
               <p className="font-bold text-slate-900 mt-0.5">{kopdesData.pengurus.ketua?.nama}</p>
             </div>
             <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">Sekretaris</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-bold uppercase">Sekretaris</span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${kopdesData.pengurus.sekretaris?.isActive !== false ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>
+                  {kopdesData.pengurus.sekretaris?.isActive !== false ? 'Tampil' : 'Off'}
+                </span>
+              </div>
               <p className="font-bold text-slate-900 mt-0.5">{kopdesData.pengurus.sekretaris?.nama}</p>
             </div>
             <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">Bendahara</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-bold uppercase">Bendahara</span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${kopdesData.pengurus.bendahara?.isActive !== false ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>
+                  {kopdesData.pengurus.bendahara?.isActive !== false ? 'Tampil' : 'Off'}
+                </span>
+              </div>
               <p className="font-bold text-slate-900 mt-0.5">{kopdesData.pengurus.bendahara?.nama}</p>
             </div>
             <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">Pengawas</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-bold uppercase">Pengawas</span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${kopdesData.pengurus.pengawas?.isActive !== false ? 'text-emerald-700 bg-emerald-100' : 'text-slate-500 bg-slate-200'}`}>
+                  {kopdesData.pengurus.pengawas?.isActive !== false ? 'Tampil' : 'Off'}
+                </span>
+              </div>
               <p className="font-bold text-slate-900 mt-0.5">{kopdesData.pengurus.pengawas?.nama}</p>
             </div>
           </div>

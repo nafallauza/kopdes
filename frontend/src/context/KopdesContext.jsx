@@ -90,6 +90,7 @@ export const KopdesProvider = ({ children }) => {
                   nama: dbPengurus.ketua?.nama?.trim() || prev.pengurus?.ketua?.nama,
                   foto: dbPengurus.ketua?.foto?.trim() || prev.pengurus?.ketua?.foto,
                   pesan: dbPengurus.ketua?.pesan?.trim() || prev.pengurus?.ketua?.pesan,
+                  isActive: dbPengurus.ketua?.isActive !== undefined ? dbPengurus.ketua.isActive : (prev.pengurus?.ketua?.isActive !== false),
                 },
                 sekretaris: {
                   ...prev.pengurus?.sekretaris,
@@ -97,6 +98,7 @@ export const KopdesProvider = ({ children }) => {
                   nama: dbPengurus.sekretaris?.nama?.trim() || prev.pengurus?.sekretaris?.nama,
                   foto: dbPengurus.sekretaris?.foto?.trim() || prev.pengurus?.sekretaris?.foto,
                   pesan: dbPengurus.sekretaris?.pesan?.trim() || prev.pengurus?.sekretaris?.pesan,
+                  isActive: dbPengurus.sekretaris?.isActive !== undefined ? dbPengurus.sekretaris.isActive : (prev.pengurus?.sekretaris?.isActive !== false),
                 },
                 bendahara: {
                   ...prev.pengurus?.bendahara,
@@ -104,6 +106,7 @@ export const KopdesProvider = ({ children }) => {
                   nama: dbPengurus.bendahara?.nama?.trim() || prev.pengurus?.bendahara?.nama,
                   foto: dbPengurus.bendahara?.foto?.trim() || prev.pengurus?.bendahara?.foto,
                   pesan: dbPengurus.bendahara?.pesan?.trim() || prev.pengurus?.bendahara?.pesan,
+                  isActive: dbPengurus.bendahara?.isActive !== undefined ? dbPengurus.bendahara.isActive : (prev.pengurus?.bendahara?.isActive !== false),
                 },
                 pengawas: {
                   ...prev.pengurus?.pengawas,
@@ -111,6 +114,7 @@ export const KopdesProvider = ({ children }) => {
                   nama: dbPengurus.pengawas?.nama?.trim() || prev.pengurus?.pengawas?.nama,
                   foto: dbPengurus.pengawas?.foto?.trim() || prev.pengurus?.pengawas?.foto,
                   pesan: dbPengurus.pengawas?.pesan?.trim() || prev.pengurus?.pengawas?.pesan,
+                  isActive: dbPengurus.pengawas?.isActive !== undefined ? dbPengurus.pengawas.isActive : (prev.pengurus?.pengawas?.isActive !== false),
                 },
               }
             } : {}),

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sprout, LogIn, UserPlus, Lock, Phone } from 'lucide-react';
+import { Sprout, LogIn, UserPlus, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { companyInfo } from '../data/dummyData';
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="min-h-screen pt-28 pb-20 flex items-center justify-center bg-slate-900 relative overflow-hidden">
@@ -65,11 +66,23 @@ const Login = () => {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="******"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none p-0.5 transition-colors"
+                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" strokeWidth={1.75} />
+                  ) : (
+                    <Eye className="w-4 h-4" strokeWidth={1.75} />
+                  )}
+                </button>
               </div>
             </div>
 

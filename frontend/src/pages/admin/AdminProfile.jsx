@@ -4,6 +4,7 @@ import imageCompression from 'browser-image-compression';
 import { useKopdes } from '../../context/KopdesContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../config/supabaseClient';
+import ToastNotification from '../../components/admin/ToastNotification';
 
 const AdminProfile = () => {
   const { kopdesData, updateProfileStatis, updateProfileDinamis } = useKopdes();
@@ -26,25 +27,29 @@ const AdminProfile = () => {
   const [ketua, setKetua] = useState({
     nama: kopdesData.pengurus.ketua?.nama || '',
     foto: kopdesData.pengurus.ketua?.foto || '',
-    pesan: kopdesData.pengurus.ketua?.pesan || ''
+    pesan: kopdesData.pengurus.ketua?.pesan || '',
+    isActive: kopdesData.pengurus.ketua?.isActive !== false,
   });
 
   const [sekretaris, setSekretaris] = useState({
     nama: kopdesData.pengurus.sekretaris?.nama || '',
     foto: kopdesData.pengurus.sekretaris?.foto || '',
-    pesan: kopdesData.pengurus.sekretaris?.pesan || ''
+    pesan: kopdesData.pengurus.sekretaris?.pesan || '',
+    isActive: kopdesData.pengurus.sekretaris?.isActive !== false,
   });
 
   const [bendahara, setBendahara] = useState({
     nama: kopdesData.pengurus.bendahara?.nama || '',
     foto: kopdesData.pengurus.bendahara?.foto || '',
-    pesan: kopdesData.pengurus.bendahara?.pesan || ''
+    pesan: kopdesData.pengurus.bendahara?.pesan || '',
+    isActive: kopdesData.pengurus.bendahara?.isActive !== false,
   });
 
   const [pengawas, setPengawas] = useState({
     nama: kopdesData.pengurus.pengawas?.nama || '',
     foto: kopdesData.pengurus.pengawas?.foto || '',
-    pesan: kopdesData.pengurus.pengawas?.pesan || ''
+    pesan: kopdesData.pengurus.pengawas?.pesan || '',
+    isActive: kopdesData.pengurus.pengawas?.isActive !== false,
   });
 
   React.useEffect(() => {
@@ -63,22 +68,26 @@ const AdminProfile = () => {
     setKetua({
       nama: kopdesData.pengurus?.ketua?.nama || '',
       foto: kopdesData.pengurus?.ketua?.foto || '',
-      pesan: kopdesData.pengurus?.ketua?.pesan || ''
+      pesan: kopdesData.pengurus?.ketua?.pesan || '',
+      isActive: kopdesData.pengurus?.ketua?.isActive !== false,
     });
     setSekretaris({
       nama: kopdesData.pengurus?.sekretaris?.nama || '',
       foto: kopdesData.pengurus?.sekretaris?.foto || '',
-      pesan: kopdesData.pengurus?.sekretaris?.pesan || ''
+      pesan: kopdesData.pengurus?.sekretaris?.pesan || '',
+      isActive: kopdesData.pengurus?.sekretaris?.isActive !== false,
     });
     setBendahara({
       nama: kopdesData.pengurus?.bendahara?.nama || '',
       foto: kopdesData.pengurus?.bendahara?.foto || '',
-      pesan: kopdesData.pengurus?.bendahara?.pesan || ''
+      pesan: kopdesData.pengurus?.bendahara?.pesan || '',
+      isActive: kopdesData.pengurus?.bendahara?.isActive !== false,
     });
     setPengawas({
       nama: kopdesData.pengurus?.pengawas?.nama || '',
       foto: kopdesData.pengurus?.pengawas?.foto || '',
-      pesan: kopdesData.pengurus?.pengawas?.pesan || ''
+      pesan: kopdesData.pengurus?.pengawas?.pesan || '',
+      isActive: kopdesData.pengurus?.pengawas?.isActive !== false,
     });
   }, [kopdesData]);
 
@@ -220,12 +229,10 @@ const AdminProfile = () => {
         </div>
       </div>
 
-      {successMessage && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          
-          <span>{successMessage}</span>
-        </div>
-      )}
+      <ToastNotification 
+        message={successMessage} 
+        onClose={() => setSuccessMessage('')} 
+      />
 
       <form onSubmit={handleCombinedSubmit} className="space-y-6">
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -420,9 +427,30 @@ const AdminProfile = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
 
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <span className="font-bold text-primary uppercase tracking-wider block border-b border-slate-200 pb-2">
-                👤 Ketua Pengurus
-              </span>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="font-bold text-primary uppercase tracking-wider">
+                  👤 Ketua Pengurus
+                </span>
+                <div className="inline-flex items-center gap-2 select-none">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                    ketua.isActive !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {ketua.isActive !== false ? 'Tampil di Web' : 'Disembunyikan'}
+                  </span>
+                  <div
+                    onClick={() => setKetua({ ...ketua, isActive: ketua.isActive === false ? true : false })}
+                    className={`w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer relative ${
+                      ketua.isActive !== false ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <div
+                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                        ketua.isActive !== false ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
                 <input
@@ -459,9 +487,30 @@ const AdminProfile = () => {
             </div>
 
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <span className="font-bold text-slate-900 uppercase tracking-wider block border-b border-slate-200 pb-2">
-                👤 Sekretaris
-              </span>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="font-bold text-slate-900 uppercase tracking-wider">
+                  👤 Sekretaris
+                </span>
+                <div className="inline-flex items-center gap-2 select-none">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                    sekretaris.isActive !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {sekretaris.isActive !== false ? 'Tampil di Web' : 'Disembunyikan'}
+                  </span>
+                  <div
+                    onClick={() => setSekretaris({ ...sekretaris, isActive: sekretaris.isActive === false ? true : false })}
+                    className={`w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer relative ${
+                      sekretaris.isActive !== false ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <div
+                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                        sekretaris.isActive !== false ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
                 <input
@@ -498,9 +547,30 @@ const AdminProfile = () => {
             </div>
 
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <span className="font-bold text-slate-800 uppercase tracking-wider block border-b border-slate-200 pb-2">
-                👤 Bendahara
-              </span>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="font-bold text-slate-800 uppercase tracking-wider">
+                  👤 Bendahara
+                </span>
+                <div className="inline-flex items-center gap-2 select-none">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                    bendahara.isActive !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {bendahara.isActive !== false ? 'Tampil di Web' : 'Disembunyikan'}
+                  </span>
+                  <div
+                    onClick={() => setBendahara({ ...bendahara, isActive: bendahara.isActive === false ? true : false })}
+                    className={`w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer relative ${
+                      bendahara.isActive !== false ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <div
+                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                        bendahara.isActive !== false ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
                 <input
@@ -537,9 +607,30 @@ const AdminProfile = () => {
             </div>
 
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <span className="font-bold text-red-700 uppercase tracking-wider block border-b border-slate-200 pb-2">
-                👤 Ketua Pengawas
-              </span>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="font-bold text-red-700 uppercase tracking-wider">
+                  👤 Ketua Pengawas
+                </span>
+                <div className="inline-flex items-center gap-2 select-none">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                    pengawas.isActive !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {pengawas.isActive !== false ? 'Tampil di Web' : 'Disembunyikan'}
+                  </span>
+                  <div
+                    onClick={() => setPengawas({ ...pengawas, isActive: pengawas.isActive === false ? true : false })}
+                    className={`w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer relative ${
+                      pengawas.isActive !== false ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <div
+                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                        pengawas.isActive !== false ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
                 <input

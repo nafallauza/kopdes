@@ -13,6 +13,26 @@ const PengurusSection = () => {
     { key: 'pengawas', title: 'Ketua Pengawas', badge: 'Pengawas', color: 'bg-red-700 text-white' },
   ];
 
+  // Filter hanya pengurus yang aktif (default true untuk data lama) dan memiliki nama
+  const activeMembers = pengurusList.filter((item) => {
+    const data = kopdesData.pengurus?.[item.key];
+    if (!data) return false;
+    if (data.isActive === false) return false;
+    return Boolean(data.nama && data.nama.trim());
+  });
+
+  // Jika semua pengurus dimatikan, sembunyikan section agar layout landing page tetap rapi
+  if (activeMembers.length === 0) {
+    return null;
+  }
+
+  const getGridClasses = (count) => {
+    if (count === 1) return 'grid grid-cols-1 max-w-sm mx-auto gap-6';
+    if (count === 2) return 'grid grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto gap-6';
+    if (count === 3) return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto gap-6';
+    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
+  };
+
   return (
     <section id="struktur" className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,8 +45,8 @@ const PengurusSection = () => {
           badge="Manajemen Resmi"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pengurusList.map((item, index) => {
+        <div className={getGridClasses(activeMembers.length)}>
+          {activeMembers.map((item, index) => {
             const data = kopdesData.pengurus[item.key];
             if (!data) return null;
 
@@ -43,7 +63,7 @@ const PengurusSection = () => {
                   {/* Photo Frame */}
                   <div className="relative aspect-[4/4] bg-slate-100 overflow-hidden border-b border-slate-200">
                     <img
-                      src={data.foto}
+                      src={data.foto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
                       alt={data.nama}
                       className="w-full h-full object-cover object-top"
                     />

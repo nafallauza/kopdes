@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Save, CheckCircle2, Phone, Mail, Facebook, Instagram, Youtube, Clock } from 'lucide-react';
 import { useKopdes } from '../../context/KopdesContext';
+import ToastNotification from '../../components/admin/ToastNotification';
 
 const AdminFooter = () => {
   const { kopdesData, updateFooter } = useKopdes();
@@ -70,12 +71,10 @@ const AdminFooter = () => {
         </div>
       </div>
 
-      {successMessage && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>{successMessage}</span>
-        </div>
-      )}
+      <ToastNotification 
+        message={successMessage} 
+        onClose={() => setSuccessMessage('')} 
+      />
 
       {/* Main Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
